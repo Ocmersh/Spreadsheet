@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Formulas
@@ -35,8 +36,38 @@ namespace Formulas
         /// If the formula is syntacticaly invalid, throws a FormulaFormatException with an 
         /// explanatory Message.
         /// </summary>
+        /// <exception cref="FormulaFormatException"></exception>
         public Formula(String formula)
         {
+            //parse out tokens
+            IEnumerable<string> userForm = GetTokens(formula);
+
+            //check for invalid type (i.e. negative number on start)
+
+                //check at least one token   
+                if (userForm.ToArray().Length > 0)
+                    throw new FormulaFormatException("The formula is empty");
+
+                    //check for first token; must be a number, a variable, or an opening parenthesis.
+                    else if (IsFirstValid(userForm))
+                        throw new FormulaFormatException("The first token is not valid.");
+
+                    //check for the last token; must be a number, a variable, or a closing parenthesis.
+                    else if (IsLastValid(userForm))
+                        throw new FormulaFormatException("The last token is not valid.");
+
+                    //check #opening pren == #closing pren (when read left to right)
+                    else if (IsPrenBalanced(userForm))
+                        throw new FormulaFormatException("The number of opening and closing parenthesis, when read left to right, is not balanced.");
+
+                    //token after open pren or operator must be; a number, a variable, or an opening parenthesis.
+                    else if (IsOpenTrailingVarValid(userForm))
+                        throw new FormulaFormatException("The token after an open parenthesis or operator was not a number, a variable or open parenthesis.");
+                
+                    //token that after a number, a variable, or a closing parenthesis must be;  an operator or a closing parenthesis.
+                    else if (IsClosingTrailingVarValid(userForm))
+                        throw new FormulaFormatException("The token after a number, variable or closing parenthesis an operator or closing parenthesis.");
+
         }
         /// <summary>
         /// Evaluates this Formula, using the Lookup delegate to determine the values of variables.  (The
@@ -50,6 +81,66 @@ namespace Formulas
         public double Evaluate(Lookup lookup)
         {
             return 0;
+        }
+
+        /// <summary>
+        /// Checks for the first token; must be a number, a variable, or an opening parenthesis.
+        /// </summary>
+        /// <param name="userInput"></param>
+        /// <returns>bool true if a valid token, false if not</returns>
+        private bool IsFirstValid(IEnumerable<string> userInput)
+        {
+            //do stuff
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks for the last token, must be a number, a variable, or a closing parenthesis.
+        /// </summary>
+        /// <param name="userInput"></param>
+        /// <returns>bool true if a valid token, false if not</returns>
+        private bool IsLastValid(IEnumerable<string> userInput)
+        {
+            //do stuff
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks to ensure that the number of opening parenthesis is equal to the number of closing pren (when read left to right).
+        /// </summary>
+        /// <param name="userInput"></param>
+        /// <returns>bool true if a valid token, false if not</returns>
+        private bool IsPrenBalanced(IEnumerable<string> userInput)
+        {
+            //do stuff
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks the token after an open pren or operator, it must be; a number, a variable, or an opening parenthesis.
+        /// </summary>
+        /// <param name="userInput"></param>
+        /// <returns>bool true if a valid token, false if not</returns>
+        private bool IsOpenTrailingVarValid(IEnumerable<string> userInput)
+        {
+            //do stuff
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks the token that after a number, a variable, or a closing parenthesis, and it must be;  an operator or a closing parenthesis.
+        /// </summary>
+        /// <param name="userInput"></param>
+        /// <returns>bool true if a valid token, false if not</returns>
+        private bool IsClosingTrailingVarValid(IEnumerable<string> userInput)
+        {
+            //do stuff
+
+            return false;
         }
 
         /// <summary>
