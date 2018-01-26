@@ -47,6 +47,66 @@ namespace FormulaTestCases
         }
 
         /// <summary>
+        /// Another syntax error.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct4()
+        {
+            Formula f = new Formula("2+3)");
+        }
+
+        /// <summary>
+        /// Another syntax error.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct5()
+        {
+            Formula f = new Formula("((2+3)");
+        }
+
+        /// <summary>
+        /// Empty formula
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct6()
+        {
+            Formula f = new Formula("");
+        }
+
+        /// <summary>
+        /// Invalid first
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct7()
+        {
+            Formula f = new Formula("%((2+3))");
+        }
+
+        /// <summary>
+        /// Invalid last
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct8()
+        {
+            Formula f = new Formula("((2+3))%");
+        }
+
+        /// <summary>
+        /// two var with no operator
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct9()
+        {
+            Formula f = new Formula("x y");
+        }
+
+        /// <summary>
         /// Makes sure that "2+3" evaluates to 5.  Since the Formula
         /// contains no variables, the delegate passed in as the
         /// parameter doesn't matter.  We are passing in one that
@@ -123,5 +183,20 @@ namespace FormulaTestCases
                 default: throw new UndefinedVariableException(v);
             }
         }
+
+        /// <summary>
+        /// Here, the delegate passed to Evaluate always throws a
+        /// UndefinedVariableException (meaning that no variables have
+        /// values).  The test case checks that the result of
+        /// evaluating the Formula is a FormulaEvaluationException.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaEvaluationException))]
+        public void Evaluate6()
+        {
+            Formula f = new Formula("5/0");
+            Assert.AreEqual(f.Evaluate(v => 0), 0, 1e-6);
+        }
+
     }
 }
