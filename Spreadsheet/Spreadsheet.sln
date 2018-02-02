@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2024
+VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyGraph", "DependencyGraph\DependencyGraph.csproj", "{862EAD85-346F-4D2B-A53C-98074FF813BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyGraphTestCases", "DependencyGraphTestCases\DependencyGraphTestCases.csproj", "{4AF4C987-60D7-4D91-B89C-D8145A610D4C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{862EAD85-346F-4D2B-A53C-98074FF813BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{862EAD85-346F-4D2B-A53C-98074FF813BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{862EAD85-346F-4D2B-A53C-98074FF813BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AF4C987-60D7-4D91-B89C-D8145A610D4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AF4C987-60D7-4D91-B89C-D8145A610D4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AF4C987-60D7-4D91-B89C-D8145A610D4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AF4C987-60D7-4D91-B89C-D8145A610D4C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

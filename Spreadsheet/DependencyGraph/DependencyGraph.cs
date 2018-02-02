@@ -1,6 +1,7 @@
 ﻿// Skeleton implementation written by Joe Zachary for CS 3500, January 2018.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Dependencies
@@ -48,11 +49,16 @@ namespace Dependencies
     /// </summary>
     public class DependencyGraph
     {
+        private Dictionary<string, HashSet<string>> dependees;
+        private Dictionary<string, HashSet<string>> dependents;
+
         /// <summary>
         /// Creates a DependencyGraph containing no dependencies.
         /// </summary>
         public DependencyGraph()
         {
+            dependees = new Dictionary<string, HashSet<string>>();
+            dependents = new Dictionary<string, HashSet<string>>();
         }
 
         /// <summary>
@@ -60,7 +66,21 @@ namespace Dependencies
         /// </summary>
         public int Size
         {
-            get { return 0; }
+            get { return GetSize(); }
+        }
+
+        /// <summary>
+        /// Helper method to obtain the size of the graph.
+        /// </summary>
+        /// <returns>int</returns>
+        private int GetSize()
+        {
+            int counter = 0;
+
+            foreach (var key in dependees)
+                counter += key.Value.Count;
+
+            return counter;
         }
 
         /// <summary>
@@ -68,6 +88,9 @@ namespace Dependencies
         /// </summary>
         public bool HasDependents(string s)
         {
+            if (dependees[s].Count >= 1)
+                return true;
+
             return false;
         }
 
@@ -76,6 +99,9 @@ namespace Dependencies
         /// </summary>
         public bool HasDependees(string s)
         {
+            if (dependents[s].Count >= 1)
+                return true;
+
             return false;
         }
 
@@ -84,7 +110,7 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
-            return null;
+            return dependees[s];
         }
 
         /// <summary>
@@ -92,7 +118,7 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
-            return null;
+            return dependents[s];
         }
 
         /// <summary>
@@ -102,6 +128,15 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
+            if (dependees.ContainsKey("s"))
+                dependees[s].Add(t);
+            else
+                dependees.Add(s, new HashSet<string>(){t});
+
+            if (dependents.ContainsKey("t"))
+                dependents[t].Add(s);
+            else
+                dependents.Add(t, new HashSet<string>() { s });
         }
 
         /// <summary>
@@ -111,6 +146,17 @@ namespace Dependencies
         /// </summary>
         public void RemoveDependency(string s, string t)
         {
+            if(dependees.ContainsKey(s))
+                if (dependees.ContainsKey("s") && dependees[s].Count > 1)
+                    dependees[s].Remove(t);
+                else
+                    dependees.Remove(s);
+
+            if(dependents.ContainsKey(t))
+                if (dependents.ContainsKey("t") && dependents[t].Count > 1)
+                    dependents[t].Remove(s);
+                else
+                    dependents.Remove(s);
         }
 
         /// <summary>
@@ -120,6 +166,10 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            foreach (string key in newDependents)
+                RemoveDependency(key, s);
+
+            dependees[s] = new HashSet<string>(newDependents);
         }
 
         /// <summary>
@@ -129,6 +179,10 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
+            foreach (string key in newDependees)
+                RemoveDependency(key, t);
+
+            dependents[t] = new HashSet<string>(newDependees);
         }
     }
 }
