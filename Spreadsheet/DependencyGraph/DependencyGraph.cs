@@ -1,6 +1,7 @@
 ﻿// Skeleton implementation written by Joe Zachary for CS 3500, January 2018.
 
 using System;
+using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -128,12 +129,12 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
-            if (dependees.ContainsKey("s"))
+            if (dependees.ContainsKey(s))
                 dependees[s].Add(t);
             else
                 dependees.Add(s, new HashSet<string>(){t});
 
-            if (dependents.ContainsKey("t"))
+            if (dependents.ContainsKey(t))
                 dependents[t].Add(s);
             else
                 dependents.Add(t, new HashSet<string>() { s });
@@ -147,16 +148,16 @@ namespace Dependencies
         public void RemoveDependency(string s, string t)
         {
             if(dependees.ContainsKey(s))
-                if (dependees.ContainsKey("s") && dependees[s].Count > 1)
+                if (dependees.ContainsKey(s) && dependees[s].Count > 0)
                     dependees[s].Remove(t);
                 else
                     dependees.Remove(s);
 
             if(dependents.ContainsKey(t))
-                if (dependents.ContainsKey("t") && dependents[t].Count > 1)
+                if (dependents.ContainsKey(t) && dependents[t].Count > 0)
                     dependents[t].Remove(s);
                 else
-                    dependents.Remove(s);
+                    dependents.Remove(t);
         }
 
         /// <summary>
@@ -183,6 +184,25 @@ namespace Dependencies
                 RemoveDependency(key, t);
 
             dependents[t] = new HashSet<string>(newDependees);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public string ToString()
+        {
+            string result = "";
+
+            foreach (var key in dependees)
+            {
+                foreach (string token in dependees["a"])
+                {
+                    result += "(" + key + " , " + token + ")" + " ";
+                }
+            }
+
+            return result;
         }
     }
 }

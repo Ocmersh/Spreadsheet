@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Dependencies;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -7,10 +9,270 @@ namespace DependencyGraphTestCases
     [TestClass]
     public class UnitTest1
     {
+
+        DependencyGraph testCase = new DependencyGraph();
+
+        /// <summary>
+        /// 
+        /// </summary>
         [TestMethod]
-        public void TestMethod1()
+        public void TestAddDep()
         {
-            DependencyGraph test = new DependencyGraph();
+            testCase = new DependencyGraph();
+
+            testCase.AddDependency("a","b");
+            testCase.AddDependency("a", "c");
+
+            IEnumerable<string> result = new List<string>(){"b","c"};
+
+            Assert.AreEqual(result.ElementAt(1), testCase.GetDependents("a").ElementAt(1));
+            Assert.AreEqual(result.ElementAt(0), testCase.GetDependents("a").ElementAt(0));
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestRemoveDep()
+        {
+            testCase = new DependencyGraph();
+
+            testCase.AddDependency("a", "b");
+            testCase.AddDependency("a", "c");
+
+            IEnumerable<string> result = new List<string>() { "b", "c" };
+
+            testCase.RemoveDependency("a", "b");
+
+            Assert.AreEqual(false, testCase.GetDependents("a").Contains("b"));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestSize()
+        {
+            testCase = new DependencyGraph();
+
+            testCase.AddDependency("a", "b");
+            testCase.AddDependency("a", "c");
+            testCase.AddDependency("a", "c");
+            testCase.AddDependency("b", "a");
+
+            Assert.AreEqual(3, testCase.Size);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestHasDependees()
+        {
+            testCase = new DependencyGraph();
+
+            testCase.AddDependency("a", "b");
+            testCase.AddDependency("a", "c");
+
+            Assert.AreEqual(true, testCase.HasDependees("c"));
+            Assert.AreEqual(true, testCase.HasDependees("b"));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestHasDependents()
+        {
+            testCase = new DependencyGraph();
+
+            testCase.AddDependency("a", "b");
+            testCase.AddDependency("a", "c");
+            testCase.AddDependency("b", "b");
+            testCase.AddDependency("c", "z");
+
+            Assert.AreEqual(true, testCase.HasDependents("a"));
+            Assert.AreEqual(true, testCase.HasDependents("b"));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestGetDependees()
+        {
+            testCase = new DependencyGraph();
+
+            testCase.AddDependency("a", "b");
+            testCase.AddDependency("a", "c");
+            testCase.AddDependency("a", "b");
+            testCase.AddDependency("a", "c");
+
+            Assert.AreEqual("a", testCase.GetDependees("b").ElementAt(0));
+            Assert.AreEqual("a", testCase.GetDependees("c").ElementAt(0));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestGetDependents()
+        {
+            testCase = new DependencyGraph();
+
+            testCase.AddDependency("a", "b");
+            testCase.AddDependency("a", "c");
+            testCase.AddDependency("a", "b");
+            testCase.AddDependency("a", "c");
+
+            IEnumerable<string> result = new List<string>() { "b", "c" };
+
+            Assert.AreEqual(result.ElementAt(1), testCase.GetDependents("a").ElementAt(1));
+            Assert.AreEqual(result.ElementAt(0), testCase.GetDependents("a").ElementAt(0));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceDependees()
+        {
+            testCase = new DependencyGraph();
+
+            testCase.AddDependency("a", "b");
+            testCase.AddDependency("a", "c");
+            testCase.AddDependency("a", "d");
+            testCase.AddDependency("a", "e"); //change a to x
+            testCase.AddDependency("e", "b");
+            testCase.AddDependency("f", "c");
+            testCase.AddDependency("g", "d");
+            testCase.AddDependency("i", "e"); //change a to z
+
+            IEnumerable<string> result = new List<string>() { "x", "z" };
+            testCase.ReplaceDependees("e", result);
+
+            Assert.AreEqual(result.ElementAt(1), testCase.GetDependees("e").ElementAt(1));
+            Assert.AreEqual(result.ElementAt(0), testCase.GetDependees("e").ElementAt(0));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceDependents()
+        {
+            testCase = new DependencyGraph();
+
+            testCase.AddDependency("a", "b"); //change b to w
+            testCase.AddDependency("a", "c"); //change c to x
+            testCase.AddDependency("a", "d"); //change d to y
+            testCase.AddDependency("a", "e"); //change e to z
+            testCase.AddDependency("e", "b");
+            testCase.AddDependency("f", "c");
+            testCase.AddDependency("g", "d");
+            testCase.AddDependency("i", "e"); 
+
+            IEnumerable<string> result = new List<string>() { "w", "x" , "y" , "z" };
+            testCase.ReplaceDependees("a", result);
+            
+            Assert.AreEqual(result.ElementAt(0), testCase.GetDependees("a").ElementAt(0));
+            Assert.AreEqual(result.ElementAt(1), testCase.GetDependees("a").ElementAt(1));
+            Assert.AreEqual(result.ElementAt(2), testCase.GetDependees("a").ElementAt(2));
+            Assert.AreEqual(result.ElementAt(3), testCase.GetDependees("a").ElementAt(3));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestSizeLarge()
+        {
+            testCase.AddDependency("a", "b");
+            testCase.AddDependency("b", "b");
+            testCase.AddDependency("c", "c");
+            testCase.AddDependency("d", "b");
+            testCase.AddDependency("e", "b");
+            testCase.AddDependency("f", "b");
+            testCase.AddDependency("g", "b");
+            testCase.AddDependency("h", "b");
+            testCase.AddDependency("i", "b");
+            testCase.AddDependency("j", "b");
+            testCase.AddDependency("k", "c");
+            testCase.AddDependency("l", "x");
+            testCase.AddDependency("m", "a");
+            testCase.AddDependency("n", "a");
+            testCase.AddDependency("o", "b");
+            testCase.AddDependency("p", "b");
+            testCase.AddDependency("q", "b");
+            testCase.AddDependency("r", "k");
+            testCase.AddDependency("s", "r");
+            testCase.AddDependency("b", "a");
+
+            Assert.AreEqual(20, testCase.Size);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestHasDependeesComplex()
+        {
+            testCase.AddDependency("a", "b");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestHasDependentsComplex()
+        {
+            testCase.AddDependency("a", "b");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestRemoveDependeesComplex()
+        {
+            testCase.AddDependency("a", "b");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestRemoveDependentsComplex()
+        {
+            testCase.AddDependency("a", "b");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceDeesComp()
+        {
+            testCase.AddDependency("a", "b");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestReplaceDentsComp()
+        {
+            testCase.AddDependency("a", "b");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void TestEqualGets()
+        {
+            testCase.AddDependency("a", "b");
+        }
+
     }
 }
