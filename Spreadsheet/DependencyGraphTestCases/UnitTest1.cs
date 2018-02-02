@@ -1,4 +1,5 @@
 ﻿using System;
+using Dependencies;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DependencyGraphTestCases
@@ -9,6 +10,7 @@ namespace DependencyGraphTestCases
         [TestMethod]
         public void TestMethod1()
         {
+            DependencyGraph test = new DependencyGraph();
         }
     }
 }
