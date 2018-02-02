@@ -140,7 +140,7 @@ namespace Formulas
         [ExpectedException(typeof(FormulaEvaluationException))]
         public void Test18()
         {
-            Formula f = new Formula("(5 + x) / (y - 3)");
+           Formula f = new Formula("(5 + x) / (y - 3)");
             f.Evaluate(s => 3);
         }
 

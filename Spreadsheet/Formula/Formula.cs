@@ -355,7 +355,7 @@ namespace Formulas
             }
             else if (operand.Equals("-"))
             {
-                return num1 - num2;
+                return num2 - num1;
             }
             else if (operand.Equals("*"))
             {
@@ -364,8 +364,8 @@ namespace Formulas
             else
             {
                 //throws if A division by zero results
-                if (num2 == 0)
-                    throw new FormulaEvaluationException("Cannot devide by Zero");
+                if (num1 == 0 || num2 == 0)
+                    throw new FormulaEvaluationException("Cannot divide by Zero");
                 else
                     return num1 / num2;
             }
