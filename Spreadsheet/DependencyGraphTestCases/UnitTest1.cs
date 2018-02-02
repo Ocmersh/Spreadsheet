@@ -1,4 +1,6 @@
-﻿using System;
+﻿///Test class for DependencyGraph written by Bryce Hansen
+/// 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Dependencies;
@@ -9,11 +11,14 @@ namespace DependencyGraphTestCases
     [TestClass]
     public class UnitTest1
     {
+        /// <summary>
+        /// This class tests each method is DependencyGraph.
+        /// </summary>
 
         DependencyGraph testCase = new DependencyGraph();
 
         /// <summary>
-        /// 
+        /// Test to make sure adding multiple key values work.
         /// </summary>
         [TestMethod]
         public void TestAddDep()
@@ -30,7 +35,7 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
-        /// 
+        /// Verify that values with no dependents are correct after removal.
         /// </summary>
         [TestMethod]
         public void TestRemoveDep()
@@ -48,7 +53,7 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
-        /// 
+        /// Using duplicates, test to make sure accurate size is reported.
         /// </summary>
         [TestMethod]
         public void TestSize()
@@ -64,7 +69,7 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
-        /// 
+        /// Tests the boolean expression to see if a given element has dependees
         /// </summary>
         [TestMethod]
         public void TestHasDependees()
@@ -79,7 +84,7 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
-        /// 
+        /// Tests the boolean expression to see if a given element has dependents, with duplicates
         /// </summary>
         [TestMethod]
         public void TestHasDependents()
@@ -96,7 +101,7 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
-        /// 
+        /// With duplicates, verify list return contains a set of dependees.
         /// </summary>
         [TestMethod]
         public void TestGetDependees()
@@ -113,7 +118,7 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
-        /// 
+        /// With duplicates, verify list return contains a set of dependents.
         /// </summary>
         [TestMethod]
         public void TestGetDependents()
@@ -132,7 +137,7 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
-        /// 
+        /// Verify replace dependees by changing multiple values and checking thier results
         /// </summary>
         [TestMethod]
         public void TestReplaceDependees()
@@ -156,7 +161,7 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
-        /// 
+        /// Verify replace dependents by changing multiple values and checking thier results
         /// </summary>
         [TestMethod]
         public void TestReplaceDependents()
@@ -173,16 +178,16 @@ namespace DependencyGraphTestCases
             testCase.AddDependency("i", "e"); 
 
             IEnumerable<string> result = new List<string>() { "w", "x" , "y" , "z" };
-            testCase.ReplaceDependees("a", result);
+            testCase.ReplaceDependents("a", result);
             
-            Assert.AreEqual(result.ElementAt(0), testCase.GetDependees("a").ElementAt(0));
-            Assert.AreEqual(result.ElementAt(1), testCase.GetDependees("a").ElementAt(1));
-            Assert.AreEqual(result.ElementAt(2), testCase.GetDependees("a").ElementAt(2));
-            Assert.AreEqual(result.ElementAt(3), testCase.GetDependees("a").ElementAt(3));
+            Assert.AreEqual(result.ElementAt(0), testCase.GetDependents("a").ElementAt(0));
+            Assert.AreEqual(result.ElementAt(1), testCase.GetDependents("a").ElementAt(1));
+            Assert.AreEqual(result.ElementAt(2), testCase.GetDependents("a").ElementAt(2));
+            Assert.AreEqual(result.ElementAt(3), testCase.GetDependents("a").ElementAt(3));
         }
 
         /// <summary>
-        /// 
+        /// Add a large number of dependencies and verify the size is correct
         /// </summary>
         [TestMethod]
         public void TestSizeLarge()
@@ -212,66 +217,65 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
-        /// 
+        /// Single test to verify no exception thrown when non existent element is requested.
         /// </summary>
         [TestMethod]
         public void TestHasDependeesComplex()
         {
-            testCase.AddDependency("a", "b");
+            testCase = new DependencyGraph();
+
+            testCase.AddDependency("a", "c");
+
+            Assert.AreEqual(false, testCase.HasDependees("a"));
         }
 
         /// <summary>
-        /// 
+        ///  Single test to verify no exception thrown when non existent element is requested.
         /// </summary>
         [TestMethod]
         public void TestHasDependentsComplex()
         {
-            testCase.AddDependency("a", "b");
+            testCase = new DependencyGraph();
+
+            testCase.AddDependency("a", "c");
+
+            Assert.AreEqual(false, testCase.HasDependents("c"));
         }
 
         /// <summary>
-        /// 
+        /// Test to remove a non-existent dependency
         /// </summary>
         [TestMethod]
         public void TestRemoveDependeesComplex()
         {
+            testCase = new DependencyGraph();
+
             testCase.AddDependency("a", "b");
+            testCase.AddDependency("a", "c");
+
+            IEnumerable<string> result = new List<string>() { "b", "c" };
+
+            testCase.RemoveDependency("c", "a");
+
+            Assert.AreEqual(true, testCase.GetDependents("a").Contains("b"));
         }
 
         /// <summary>
-        /// 
+        /// Test to see if false flag is thrown if elment does not exist upon non existent removal.
         /// </summary>
         [TestMethod]
         public void TestRemoveDependentsComplex()
         {
-            testCase.AddDependency("a", "b");
-        }
+            testCase = new DependencyGraph();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        [TestMethod]
-        public void TestReplaceDeesComp()
-        {
             testCase.AddDependency("a", "b");
-        }
+            testCase.AddDependency("a", "c");
 
-        /// <summary>
-        /// 
-        /// </summary>
-        [TestMethod]
-        public void TestReplaceDentsComp()
-        {
-            testCase.AddDependency("a", "b");
-        }
+            IEnumerable<string> result = new List<string>() { "b", "c" };
 
-        /// <summary>
-        /// 
-        /// </summary>
-        [TestMethod]
-        public void TestEqualGets()
-        {
-            testCase.AddDependency("a", "b");
+            testCase.RemoveDependency("x", "y");
+
+            Assert.AreEqual(false, testCase.GetDependents("a").Contains("y"));
         }
 
     }

@@ -1,4 +1,6 @@
 ﻿// Skeleton implementation written by Joe Zachary for CS 3500, January 2018.
+///Remainder of the program written by Bryce Hansen, U0804551, February 2018
+/// 
 
 using System;
 using System.CodeDom.Compiler;
@@ -50,6 +52,7 @@ namespace Dependencies
     /// </summary>
     public class DependencyGraph
     {
+        //Two Dictionary objects, to keep track of dependees and dependents.
         private Dictionary<string, HashSet<string>> dependees;
         private Dictionary<string, HashSet<string>> dependents;
 
@@ -58,6 +61,7 @@ namespace Dependencies
         /// </summary>
         public DependencyGraph()
         {
+            //Initialize both dictionaries
             dependees = new Dictionary<string, HashSet<string>>();
             dependents = new Dictionary<string, HashSet<string>>();
         }
@@ -67,6 +71,7 @@ namespace Dependencies
         /// </summary>
         public int Size
         {
+            //invoke help method to find size
             get { return GetSize(); }
         }
 
@@ -78,6 +83,7 @@ namespace Dependencies
         {
             int counter = 0;
 
+            //iterate through each key in one of the maps, and count each valid pair and return it
             foreach (var key in dependees)
                 counter += key.Value.Count;
 
@@ -89,7 +95,8 @@ namespace Dependencies
         /// </summary>
         public bool HasDependents(string s)
         {
-            if (dependees[s].Count >= 1)
+            //if the key is in the dependee map, it has dependents.
+            if (dependees.ContainsKey(s))
                 return true;
 
             return false;
@@ -100,7 +107,8 @@ namespace Dependencies
         /// </summary>
         public bool HasDependees(string s)
         {
-            if (dependents[s].Count >= 1)
+            //if the key is in the dependent map, it has dependees
+            if (dependents.ContainsKey(s))
                 return true;
 
             return false;
@@ -111,7 +119,11 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
-            return dependees[s];
+            //looks up hashset in map and returns it
+            if (dependees.ContainsKey(s))
+                return dependees[s];
+            else
+                return null;
         }
 
         /// <summary>
@@ -119,7 +131,11 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
-            return dependents[s];
+            //looks up hashset in map and returns it
+            if (dependents.ContainsKey(s))
+                return dependents[s];
+            else
+                return null;
         }
 
         /// <summary>
@@ -129,11 +145,13 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
+            //add new pair to to map, or update existing dependee
             if (dependees.ContainsKey(s))
                 dependees[s].Add(t);
             else
                 dependees.Add(s, new HashSet<string>(){t});
 
+            //and update dependet graph aswell
             if (dependents.ContainsKey(t))
                 dependents[t].Add(s);
             else
@@ -147,17 +165,16 @@ namespace Dependencies
         /// </summary>
         public void RemoveDependency(string s, string t)
         {
+            //removes the key if located in dependee graph
             if(dependees.ContainsKey(s))
-                if (dependees.ContainsKey(s) && dependees[s].Count > 0)
+                if (dependees.ContainsKey(s))
                     dependees[s].Remove(t);
-                else
-                    dependees.Remove(s);
 
+            //removes the key if located in the dependent graph
             if(dependents.ContainsKey(t))
-                if (dependents.ContainsKey(t) && dependents[t].Count > 0)
+                if (dependents.ContainsKey(t))
                     dependents[t].Remove(s);
-                else
-                    dependents.Remove(t);
+
         }
 
         /// <summary>
@@ -167,9 +184,11 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            //update dependee graph
             foreach (string key in newDependents)
                 RemoveDependency(key, s);
 
+            //reset dependents to new values of given key
             dependees[s] = new HashSet<string>(newDependents);
         }
 
@@ -180,29 +199,13 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
+            //update dependent graph
             foreach (string key in newDependees)
                 RemoveDependency(key, t);
 
+            //reset dependees to new values of given key
             dependents[t] = new HashSet<string>(newDependees);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public string ToString()
-        {
-            string result = "";
-
-            foreach (var key in dependees)
-            {
-                foreach (string token in dependees["a"])
-                {
-                    result += "(" + key + " , " + token + ")" + " ";
-                }
-            }
-
-            return result;
-        }
     }
 }
