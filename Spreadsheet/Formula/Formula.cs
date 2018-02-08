@@ -45,37 +45,40 @@ namespace Formulas
         public Formula(String formula)
         {
             //parse out tokens
-             userForm = GetTokens(formula);
+            userForm = GetTokens(formula);
 
-                //check at least one token   
-                if (userForm.ToArray().Length == 0)
-                    throw new FormulaFormatException("The formula is empty");
+            //check at least one token   
+            if (userForm.ToArray().Length == 0)
+                throw new FormulaFormatException("The formula is empty");
 
-                    //check for invalid type (i.e. negative number on start)
-                    else if (userForm.ElementAt(0).Equals("-"))
-                        throw new FormulaFormatException("The first token cannot be a negative number");
+            //check for invalid type (i.e. negative number on start)
+            else if (userForm.ElementAt(0).Equals("-"))
+                throw new FormulaFormatException("The first token cannot be a negative number");
 
-                    //check for first token; must be a number, a variable, or an opening parenthesis.
-                    else if (!IsFirstValid(userForm))
-                        throw new FormulaFormatException("The first token is not valid.");
+            //check for first token; must be a number, a variable, or an opening parenthesis.
+            else if (!IsFirstValid(userForm))
+                throw new FormulaFormatException("The first token is not valid.");
 
-                    //check for the last token; must be a number, a variable, or a closing parenthesis.
-                    else if (!IsLastValid(userForm))
-                        throw new FormulaFormatException("The last token is not valid.");
+            //check for the last token; must be a number, a variable, or a closing parenthesis.
+            else if (!IsLastValid(userForm))
+                throw new FormulaFormatException("The last token is not valid.");
 
-                    //check #opening pren == #closing pren (when read left to right)
-                    else if (!IsPrenBalanced(userForm))
-                        throw new FormulaFormatException("The number of opening and closing parenthesis, when read left to right, is not balanced.");
+            //check #opening pren == #closing pren (when read left to right)
+            else if (!IsPrenBalanced(userForm))
+                throw new FormulaFormatException(
+                    "The number of opening and closing parenthesis, when read left to right, is not balanced.");
 
-                    //token after open pren or operator must be; a number, a variable, or an opening parenthesis.
-                    else if (!IsOpenTrailingVarValid(userForm))
-                        throw new FormulaFormatException("The token after an open parenthesis or operator was not a number, a variable or open parenthesis.");
-                
-                    //token that after a number, a variable, or a closing parenthesis must be;  an operator or a closing parenthesis.
-                    else if (!IsClosingTrailingVarValid(userForm))
-                        throw new FormulaFormatException("The token after a number, variable or closing parenthesis an operator or closing parenthesis.");
+            //token after open pren or operator must be; a number, a variable, or an opening parenthesis.
+            else if (!IsOpenTrailingVarValid(userForm))
+                throw new FormulaFormatException(
+                    "The token after an open parenthesis or operator was not a number, a variable or open parenthesis.");
 
+            //token that after a number, a variable, or a closing parenthesis must be;  an operator or a closing parenthesis.
+            else if (!IsClosingTrailingVarValid(userForm))
+                throw new FormulaFormatException(
+                    "The token after a number, variable or closing parenthesis an operator or closing parenthesis.");
         }
+
         /// <summary>
         /// Evaluates this Formula, using the Lookup delegate to determine the values of variables.  (The
         /// delegate takes a variable name as a parameter and returns its value (if it has one) or throws
@@ -90,28 +93,25 @@ namespace Formulas
             Stack<string> operatorStack = new Stack<string>();
             Stack<double> valueStack = new Stack<double>();
             var tempV = 0.0;
-
             foreach (string token in userForm)
             {
                 if (double.TryParse(token, out tempV))
                 {
                     //If * or / is at the top of the operator stack, 
-                    if (operatorStack.Count != 0 && (operatorStack.Peek().Equals("*") || operatorStack.Peek().Equals("/")))
+                    if (operatorStack.Count != 0 &&
+                        (operatorStack.Peek().Equals("*") || operatorStack.Peek().Equals("/")))
                     {
                         //pop the value stack, pop the operator stack, and 
                         //apply the popped operator to tempV and the popped number. Push the result onto the value stack.
-
                         valueStack.Push(computeNum(operatorStack.Pop(), valueStack.Pop(), tempV));
                     }
                     else
-                    //Otherwise, push tempV onto the value stack
+                        //Otherwise, push tempV onto the value stack
                         valueStack.Push(tempV);
-                   
                 }
                 else if (IsVariable(token))
                 {
                     double varVal = 0.0;
-
                     try
                     {
                         //throws if Looking up up t reveals it has no value
@@ -123,30 +123,28 @@ namespace Formulas
                     }
 
                     //If * or / is at the top of the operator stack, 
-                    if (operatorStack.Count != 0 && (operatorStack.Peek().Equals("*") || operatorStack.Peek().Equals("/")))
+                    if (operatorStack.Count != 0 &&
+                        (operatorStack.Peek().Equals("*") || operatorStack.Peek().Equals("/")))
                     {
                         //pop the value stack, pop the operator stack, and 
                         //apply the popped operator to varVal and the popped number. Push the result onto the value stack.
-
                         valueStack.Push(computeNum(operatorStack.Pop(), valueStack.Pop(), varVal));
                     }
                     else
                         //Otherwise, push varVal onto the value stack
                         valueStack.Push(varVal);
-
-                    
                 }
                 else if (token.Equals("+") || token.Equals("-"))
                 {
                     //If + or - is at the top of the operator stack, pop the value stack 
                     //twice and the operator stack once. 
                     //Push the result onto the value stack.
-
-                    if(operatorStack.Count != 0 && (operatorStack.Peek().Equals("+") || operatorStack.Peek().Equals("-")))
+                    if (operatorStack.Count != 0 &&
+                        (operatorStack.Peek().Equals("+") || operatorStack.Peek().Equals("-")))
                         valueStack.Push(computeNum(operatorStack.Pop(), valueStack.Pop(), valueStack.Pop()));
 
                     //Whether or not you did the first step, push token onto the operator stack
-                        operatorStack.Push(token);
+                    operatorStack.Push(token);
                 }
                 else if (token.Equals("*") || token.Equals("/"))
                 {
@@ -162,7 +160,8 @@ namespace Formulas
                 {
                     //If + or - is at the top of the operator stack, pop the value stack twice and the operator stack once. 
                     //Apply the popped operator to the popped numbers. Push the result onto the value stack.
-                    if (operatorStack.Count != 0 && (operatorStack.Peek().Equals("+") || operatorStack.Peek().Equals("-")))
+                    if (operatorStack.Count != 0 &&
+                        (operatorStack.Peek().Equals("+") || operatorStack.Peek().Equals("-")))
                         valueStack.Push(computeNum(operatorStack.Pop(), valueStack.Pop(), valueStack.Pop()));
 
                     //Whether or not you did the first step, the top of the operator stack will be a(. Pop it.
@@ -170,7 +169,8 @@ namespace Formulas
 
                     // if *or / is at the top of the operator stack, pop the value stack twice and the operator stack once. Apply the popped operator to the
                     //popped numbers. Push the result onto the value stack.
-                    if (operatorStack.Count != 0 && (operatorStack.Peek().Equals("*") || operatorStack.Peek().Equals("/")))
+                    if (operatorStack.Count != 0 &&
+                        (operatorStack.Peek().Equals("*") || operatorStack.Peek().Equals("/")))
                     {
                         valueStack.Push(computeNum(operatorStack.Pop(), valueStack.Pop(), valueStack.Pop()));
                     }
@@ -201,7 +201,6 @@ namespace Formulas
         {
             string token = userInput.ElementAt(0);
             double n;
-
             if (double.TryParse(token, out n) || IsVariable(token) || token.Equals("("))
                 return true;
             else
@@ -217,12 +216,10 @@ namespace Formulas
         {
             string token = userInput.Last();
             double n;
-
             if (double.TryParse(token, out n) || IsVariable(token) || token.Equals(")"))
                 return true;
             else
                 return false;
-   
         }
 
         /// <summary>
@@ -234,20 +231,17 @@ namespace Formulas
         {
             int openCounter = 0;
             int closedCounter = 0;
-
             foreach (string token in userInput)
             {
                 if (token.Equals("("))
                     openCounter++;
                 else if (token.Equals(")"))
                     closedCounter++;
-
-                if (closedCounter > openCounter)
-                    return false;
+                if (closedCounter > openCounter) return false;
             }
 
-            if(openCounter == closedCounter)
-            return true;
+            if (openCounter == closedCounter)
+                return true;
             else
             {
                 return false;
@@ -263,17 +257,14 @@ namespace Formulas
         {
             int counter = 0;
             double tempV = 0;
-
             foreach (string token in userInput)
             {
                 if (token.Equals("(") || token.Equals("+") || token.Equals("-") || token.Equals("/") ||
                     token.Equals("*"))
                 {
                     string nextVar = userInput.ElementAt(counter + 1);
-
                     if (!(double.TryParse(nextVar, out tempV) || IsVariable(nextVar) || nextVar.Equals("(")))
                         return false;
-
                 }
 
                 counter++;
@@ -291,20 +282,15 @@ namespace Formulas
         {
             int counter = 0;
             double tempV = 0;
-
             foreach (string token in userInput)
             {
                 if (token.Equals(")") || IsVariable(token) || double.TryParse(token, out tempV))
                 {
-                    if (counter + 1 >= userInput.Count())
-                        return true;
-
+                    if (counter + 1 >= userInput.Count()) return true;
                     string nextVar = userInput.ElementAt(counter + 1);
-
                     if (!(nextVar.Equals(")") || nextVar.Equals("+") || nextVar.Equals("-") || nextVar.Equals("/") ||
                           nextVar.Equals("*")))
                         return false;
-
                 }
 
                 counter++;
@@ -323,11 +309,11 @@ namespace Formulas
             Char[] posVar = token.ToCharArray();
             Char firstLetter = posVar[0];
             int holding = 0;
-
             if (firstLetter >= 'A' && firstLetter <= 'Z' || firstLetter >= 'a' && firstLetter <= 'z')
                 foreach (char subToken in posVar)
                 {
-                    if ((int.TryParse((subToken.ToString()), out holding) || ((subToken >= 'A' && subToken <= 'Z' || subToken >= 'a' && subToken <= 'z'))))
+                    if ((int.TryParse((subToken.ToString()), out holding) ||
+                         ((subToken >= 'A' && subToken <= 'Z' || subToken >= 'a' && subToken <= 'z'))))
                         continue;
                     else
                         return false;
@@ -348,7 +334,6 @@ namespace Formulas
         private double computeNum(string operand, double num1, double num2)
         {
             num2 = Math.Round(num2);
-
             if (operand.Equals("+"))
             {
                 return num1 + num2;
@@ -399,8 +384,8 @@ namespace Formulas
             // Overall pattern.  It contains embedded white space that must be ignored when
             // it is used.  See below for an example of this.  This pattern is useful for 
             // splitting a string into tokens.
-            String splittingPattern = String.Format("({0}) | ({1}) | ({2}) | ({3}) | ({4}) | ({5})",
-                                            lpPattern, rpPattern, opPattern, varPattern, doublePattern, spacePattern);
+            String splittingPattern = String.Format("({0}) | ({1}) | ({2}) | ({3}) | ({4}) | ({5})", lpPattern,
+                rpPattern, opPattern, varPattern, doublePattern, spacePattern);
 
             // Enumerate matching tokens that don't consist solely of white space.
             // PLEASE NOTE:  Notice the second parameter to Split, which says to ignore embedded white space
@@ -436,8 +421,7 @@ namespace Formulas
         /// undefined variable.
         /// </summary>
         /// <param name="variable"></param>
-        public UndefinedVariableException(String variable)
-            : base(variable)
+        public UndefinedVariableException(String variable) : base(variable)
         {
         }
     }
