@@ -85,9 +85,7 @@ namespace Dependencies
             int counter = 0;
 
             //iterate through each key in one of the maps, and count each valid pair and return it
-            foreach (var key in dependees)
-                counter += key.Value.Count;
-
+            foreach (var key in dependees) counter += key.Value.Count;
             return counter;
         }
 
@@ -97,9 +95,7 @@ namespace Dependencies
         public bool HasDependents(string s)
         {
             //if the key is in the dependee map, it has dependents.
-            if (dependees.ContainsKey(s))
-                return true;
-
+            if (dependees.ContainsKey(s)) return true;
             return false;
         }
 
@@ -109,9 +105,7 @@ namespace Dependencies
         public bool HasDependees(string s)
         {
             //if the key is in the dependent map, it has dependees
-            if (dependents.ContainsKey(s))
-                return true;
-
+            if (dependents.ContainsKey(s)) return true;
             return false;
         }
 
@@ -132,7 +126,6 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
-
             //looks up hashset in map and returns it
             if (dependents.ContainsKey(s))
                 return dependents[s];
@@ -151,13 +144,13 @@ namespace Dependencies
             if (dependees.ContainsKey(s))
                 dependees[s].Add(t);
             else
-                dependees.Add(s, new HashSet<string>(){t});
+                dependees.Add(s, new HashSet<string>() {t});
 
             //and update dependet graph aswell
             if (dependents.ContainsKey(t))
                 dependents[t].Add(s);
             else
-                dependents.Add(t, new HashSet<string>() { s });
+                dependents.Add(t, new HashSet<string>() {s});
         }
 
         /// <summary>
@@ -167,23 +160,20 @@ namespace Dependencies
         /// </summary>
         public void RemoveDependency(string s, string t)
         {
-            if (dependees.Count == 0 || dependents.Count == 0)
-                return;
+            if (dependees.Count == 0 || dependents.Count == 0) return;
 
             //removes the key if located in dependee graph
             if (dependees.ContainsKey(s))
             {
                 dependees[s].Remove(t);
-                if (dependees[s].Count == 0)
-                    dependees.Remove(s);
+                if (dependees[s].Count == 0) dependees.Remove(s);
             }
 
             //removes the key if located in the dependent graph
             if (dependents.ContainsKey(t))
             {
                 dependents[t].Remove(s);
-                if (dependents[t].Count == 0)
-                    dependents.Remove(t);
+                if (dependents[t].Count == 0) dependents.Remove(t);
             }
         }
 
@@ -195,25 +185,23 @@ namespace Dependencies
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
             HashSet<string> newDependentList = new HashSet<string>(newDependents);
-
-            if (newDependentList.Count == 0)
+            if (dependees.ContainsKey(s))
             {
-                dependees.Remove(s);
-                return;
+                if (newDependentList.Count == 0)
+                {
+                    dependees.Remove(s);
+                    return;
+                }
+
+                foreach (var dependent in dependees[s])
+                {
+                    dependents[dependent].Remove(s);
+                    if (dependents[dependent].Count == 0) dependents.Remove(dependent);
+                }
+
+                //reset dependents to new values of given key
+                dependees[s] = new HashSet<string>();
             }
-
-            foreach (var dependent in dependees[s])
-            {
-                dependents[dependent].Remove(s);
-
-                if (dependents[dependent].Count == 0)
-                    dependents.Remove(dependent);
-            }
-
-            //reset dependents to new values of given key
-            dependees[s] = new HashSet<string>();
-
-
 
             foreach (var newDependent in newDependentList)
             {
@@ -229,29 +217,28 @@ namespace Dependencies
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
             HashSet<string> newDependeeList = new HashSet<string>(newDependees);
-
-            if (newDependeeList.Count == 0)
+            if (dependents.ContainsKey(t))
             {
-                dependents.Remove(t);
-                return;
+                if (newDependeeList.Count == 0)
+                {
+                    dependents.Remove(t);
+                    return;
+                }
+
+                foreach (var dependee in dependents[t])
+                {
+                    dependees[dependee].Remove(t);
+                    if (dependees[dependee].Count == 0) dependees.Remove(dependee);
+                }
+
+                //reset dependees to new values of given key
+                dependents[t] = new HashSet<string>();
             }
-
-            foreach (var dependee in dependents[t])
-            {
-                dependees[dependee].Remove(t);
-
-                if (dependees[dependee].Count == 0)
-                    dependees.Remove(dependee);
-            }
-
-            //reset dependees to new values of given key
-            dependents[t] = new HashSet<string>();
 
             foreach (var newDependee in newDependeeList)
             {
                 AddDependency(newDependee, t);
             }
         }
-
     }
 }
