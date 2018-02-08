@@ -193,6 +193,7 @@ namespace Dependencies
                     return;
                 }
 
+                //remove empty elements
                 foreach (var dependent in dependees[s])
                 {
                     dependents[dependent].Remove(s);
@@ -225,6 +226,7 @@ namespace Dependencies
                     return;
                 }
 
+                //remove empty elements
                 foreach (var dependee in dependents[t])
                 {
                     dependees[dependee].Remove(t);
