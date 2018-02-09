@@ -68,26 +68,6 @@ namespace Dependencies
         }
 
         /// <summary>
-        /// Takes a DependencyGraph as a parameter and creates an identical one.
-        /// </summary>
-        /// <param name="oldGraph"></param>
-        public DependencyGraph(DependencyGraph oldGraph)
-        {
-            dependees = oldGraph.GetDees();
-            dependents = oldGraph.GetDents();
-        }
-
-        private Dictionary<string, HashSet<string>> GetDees()
-        {
-            return dependees;
-        }
-
-        private Dictionary<string, HashSet<string>> GetDents()
-        {
-            return dependents;
-        }
-
-        /// <summary>
         /// The number of dependencies in the DependencyGraph.
         /// </summary>
         public int Size
@@ -110,45 +90,30 @@ namespace Dependencies
         }
 
         /// <summary>
-        /// Reports whether dependents(s) is non-empty.  Requires s != null. Throws ArgumentNullException
-        /// if s == null.
+        /// Reports whether dependents(s) is non-empty.  Requires s != null.
         /// </summary>
-        /// throws ArgumentNullException()
         public bool HasDependents(string s)
         {
-            if (s == null)
-                throw new ArgumentNullException();
-
             //if the key is in the dependee map, it has dependents.
             if (dependees.ContainsKey(s)) return true;
             return false;
         }
 
         /// <summary>
-        /// Reports whether dependees(s) is non-empty.  Requires s != null. Throws ArgumentNullException
-        /// if s == null.
+        /// Reports whether dependees(s) is non-empty.  Requires s != null.
         /// </summary>
-        /// throws ArgumentNullException()
         public bool HasDependees(string s)
         {
-            if (s == null)
-                throw new ArgumentNullException();
-
             //if the key is in the dependent map, it has dependees
             if (dependents.ContainsKey(s)) return true;
             return false;
         }
 
         /// <summary>
-        /// Enumerates dependents(s).  Requires s != null.  Throws ArgumentNullException
-        /// if s == null.
+        /// Enumerates dependents(s).  Requires s != null.
         /// </summary>
-        /// throws ArgumentNullException()
         public IEnumerable<string> GetDependents(string s)
         {
-            if (s == null)
-                throw new ArgumentNullException();
-
             //looks up hashset in map and returns it
             if (dependees.ContainsKey(s))
                 return dependees[s];
@@ -157,15 +122,10 @@ namespace Dependencies
         }
 
         /// <summary>
-        /// Enumerates dependees(s).  Requires s != null. Throws ArgumentNullException
-        /// if s == null.
+        /// Enumerates dependees(s).  Requires s != null.
         /// </summary>
-        /// throws ArgumentNullException()
         public IEnumerable<string> GetDependees(string s)
         {
-            if (s == null)
-                throw new ArgumentNullException();
-
             //looks up hashset in map and returns it
             if (dependents.ContainsKey(s))
                 return dependents[s];
@@ -176,15 +136,10 @@ namespace Dependencies
         /// <summary>
         /// Adds the dependency (s,t) to this DependencyGraph.
         /// This has no effect if (s,t) already belongs to this DependencyGraph.
-        /// Requires s != null and t != null. Throws ArgumentNullException
-        /// if s == null or t == null.
+        /// Requires s != null and t != null.
         /// </summary>
-        /// throws ArgumentNullException()
         public void AddDependency(string s, string t)
         {
-            if (s == null || t == null)
-                throw new ArgumentNullException();
-
             //add new pair to to map, or update existing dependee
             if (dependees.ContainsKey(s))
                 dependees[s].Add(t);
@@ -201,15 +156,10 @@ namespace Dependencies
         /// <summary>
         /// Removes the dependency (s,t) from this DependencyGraph.
         /// Does nothing if (s,t) doesn't belong to this DependencyGraph.
-        /// Requires s != null and t != null. Throws ArgumentNullException
-        /// if s == null or t == null.
+        /// Requires s != null and t != null.
         /// </summary>
-        /// throws ArgumentNullException()
         public void RemoveDependency(string s, string t)
         {
-            if (s == null || t == null)
-                throw new ArgumentNullException();
-
             if (dependees.Count == 0 || dependents.Count == 0) return;
 
             //removes the key if located in dependee graph
@@ -230,24 +180,11 @@ namespace Dependencies
         /// <summary>
         /// Removes all existing dependencies of the form (s,r).  Then, for each
         /// t in newDependents, adds the dependency (s,t).
-        /// Requires s != null and t != null. Throws ArgumentNullException
-        /// if s == null or t == null.
+        /// Requires s != null and t != null.
         /// </summary>
-        /// throws ArgumentNullException()
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
-
-            if (s == null || newDependents == null)
-                throw new ArgumentNullException();
-
             HashSet<string> newDependentList = new HashSet<string>(newDependents);
-
-            foreach (var parameter in newDependentList)
-            {
-                if (parameter == null)
-                    throw new ArgumentNullException();
-            }
-
             if (dependees.ContainsKey(s))
             {
                 if (newDependentList.Count == 0)
@@ -276,24 +213,11 @@ namespace Dependencies
         /// <summary>
         /// Removes all existing dependencies of the form (r,t).  Then, for each 
         /// s in newDependees, adds the dependency (s,t).
-        /// Requires s != null and t != null. Throws ArgumentNullException. Also throws
-        /// the same exception if any tokens in t are null.
-        /// if s == null or t == null.
+        /// Requires s != null and t != null.
         /// </summary>
-        /// throws ArgumentNullException()
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
-            if (t == null || newDependees == null)
-                throw new ArgumentNullException();
-
             HashSet<string> newDependeeList = new HashSet<string>(newDependees);
-
-            foreach (var parameter in newDependeeList)
-            {
-                if(parameter == null)
-                    throw new ArgumentNullException();
-            }
-
             if (dependents.ContainsKey(t))
             {
                 if (newDependeeList.Count == 0)
