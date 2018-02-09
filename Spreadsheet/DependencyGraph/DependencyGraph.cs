@@ -270,7 +270,7 @@ namespace Dependencies
 
         /// <summary>
         /// Removes all existing dependencies of the form (r,t).  Then, for each 
-        /// s in newDependees, adds the dependency (s,t).
+        /// s in newDependees, adds the dependency (s,t)
         /// Requires s != null and t != null. Throws ArgumentNullException. Also throws
         /// the same exception if any tokens in t are null.
         /// if s == null or t == null.
