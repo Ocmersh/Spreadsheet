@@ -68,6 +68,26 @@ namespace Dependencies
         }
 
         /// <summary>
+        /// Takes a DependencyGraph as a parameter and creates an identical one.
+        /// </summary>
+        /// <param name="oldGraph"></param>
+        public DependencyGraph(DependencyGraph oldGraph)
+        {
+            dependees = oldGraph.GetDees();
+            dependents = oldGraph.GetDents();
+        }
+
+        private Dictionary<string, HashSet<string>> GetDees()
+        {
+            return dependees;
+        }
+
+        private Dictionary<string, HashSet<string>> GetDents()
+        {
+            return dependents;
+        }
+
+        /// <summary>
         /// The number of dependencies in the DependencyGraph.
         /// </summary>
         public int Size
