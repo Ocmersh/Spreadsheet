@@ -73,8 +73,8 @@ namespace Dependencies
         /// <param name="oldGraph"></param>
         public DependencyGraph(DependencyGraph oldGraph)
         {
-            dependees = oldGraph.GetDees();
-            dependents = oldGraph.GetDents();
+            dependees = new Dictionary<string, HashSet<string>>(oldGraph.GetDees()); 
+            dependents = new Dictionary<string, HashSet<string>>(oldGraph.GetDents());
         }
 
         private Dictionary<string, HashSet<string>> GetDees()
@@ -250,11 +250,6 @@ namespace Dependencies
 
             if (dependees.ContainsKey(s))
             {
-                if (newDependentList.Count == 0)
-                {
-                    dependees.Remove(s);
-                    return;
-                }
 
                 //remove empty elements
                 foreach (var dependent in dependees[s])
@@ -296,13 +291,8 @@ namespace Dependencies
 
             if (dependents.ContainsKey(t))
             {
-                if (newDependeeList.Count == 0)
-                {
-                    dependents.Remove(t);
-                    return;
-                }
 
-                //remove empty elements
+            //remove empty elements
                 foreach (var dependee in dependents[t])
                 {
                     dependees[dependee].Remove(t);

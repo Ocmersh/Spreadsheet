@@ -281,9 +281,152 @@ namespace DependencyGraphTestCases
         /// <summary>
         /// Test that each method throws the appropriate null exception
         /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void NullTests()
         {
+            DependencyGraph t = new DependencyGraph();
+            t.HasDependents(null);
+        }
 
+        /// <summary>
+        /// Test that each method throws the appropriate null exception
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void NullTests2()
+        {
+            DependencyGraph t = new DependencyGraph();
+            t.HasDependees(null);
+        }
+
+        /// <summary>
+        /// Test that each method throws the appropriate null exception
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void NullTests3()
+        {
+            DependencyGraph t = new DependencyGraph();
+            t.GetDependees(null);
+        }
+
+        /// <summary>
+        /// Test that each method throws the appropriate null exception
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void NullTests4()
+        {
+            DependencyGraph t = new DependencyGraph();
+            t.GetDependents(null);
+        }
+
+        /// <summary>
+        /// Test that each method throws the appropriate null exception
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void NullTests5()
+        {
+            DependencyGraph t = new DependencyGraph();
+            t.AddDependency("a", null);
+        }
+
+        /// <summary>
+        /// Test that each method throws the appropriate null exception
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void NullTests6()
+        {
+            DependencyGraph t = new DependencyGraph();
+            t.RemoveDependency("b", null);
+        }
+
+        /// <summary>
+        /// Test that each method throws the appropriate null exception
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void NullTests7()
+        {
+            DependencyGraph t = new DependencyGraph();
+            t.ReplaceDependees(null, null);
+        }
+
+        /// <summary>
+        /// Test that each method throws the appropriate null exception
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void NullTests8()
+        {
+            DependencyGraph t = new DependencyGraph();
+            t.ReplaceDependents(null, null);
+        }
+
+        /// <summary>
+        /// Test that each method throws the appropriate null exception
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void NullTests9()
+        {
+            DependencyGraph t = new DependencyGraph();
+            HashSet<string> b = new HashSet<string>(){ "a", null };
+            t.ReplaceDependees("a", b);
+        }
+
+        /// <summary>
+        /// Test that each method throws the appropriate null exception
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void NullTests10()
+        {
+            DependencyGraph t = new DependencyGraph();
+            HashSet<string> b = new HashSet<string>() { "a", null };
+            t.ReplaceDependents("b", b);
+        }
+
+        /// <summary>
+        /// Check to see if copied dependency list is equal to the first
+        /// </summary>
+        [TestMethod]
+        public void IsEqualCopy()
+        {
+            testCase = new DependencyGraph();
+            testCase.AddDependency("a", "b");
+            testCase.AddDependency("b", "b");
+            testCase.AddDependency("c", "c");
+            testCase.AddDependency("d", "b");
+            testCase.AddDependency("e", "b");
+            testCase.AddDependency("f", "b");
+            testCase.AddDependency("g", "b");
+            testCase.AddDependency("h", "b");
+            testCase.AddDependency("i", "b");
+            testCase.AddDependency("j", "b");
+            testCase.AddDependency("k", "c");
+            testCase.AddDependency("l", "x");
+            testCase.AddDependency("m", "a");
+            testCase.AddDependency("n", "a");
+            testCase.AddDependency("o", "b");
+            testCase.AddDependency("p", "b");
+            testCase.AddDependency("q", "b");
+            testCase.AddDependency("r", "k");
+            testCase.AddDependency("s", "r");
+            testCase.AddDependency("b", "a");
+
+            DependencyGraph testCase2 = new DependencyGraph(testCase);
+
+            Assert.AreEqual(testCase.Size, testCase2.Size);
+            Assert.AreEqual(testCase.GetDependees("a"), testCase2.GetDependees("a"));
+            Assert.AreEqual(testCase.GetDependees("b"), testCase2.GetDependees("b"));
+
+            testCase.ReplaceDependees("b", new HashSet<string>(){"x"});
+
+            Assert.AreNotEqual(testCase.GetDependees("b"), testCase2.GetDependees("b"));
         }
 
 
