@@ -13,7 +13,7 @@ namespace Dependencies
     /// <summary>
     /// A DependencyGraph can be modeled as a set of dependencies, where a dependency is an ordered 
     /// pair of strings.  Two dependencies (s1,t1) and (s2,t2) are considered equal if and only if 
-    /// s1 equals s2 and t1 equals t2.
+    /// s1 equals s2 and t1 equals t2
     /// 
     /// Given a DependencyGraph DG:
     /// 
