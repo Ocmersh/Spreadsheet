@@ -1,5 +1,5 @@
 ﻿// Skeleton written by Joe Zachary for CS 3500, January 2017
-// Main body written by Bryce Hansen for 3500, 1/25/18 / U0804551
+// Main body written by Bryce Hansen for 3500, 2/8/18 / U0804551
 
 using System;
 using System.Collections.Generic;

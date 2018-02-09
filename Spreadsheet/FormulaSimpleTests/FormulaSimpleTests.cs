@@ -1,4 +1,5 @@
 ﻿// Written by Joe Zachary for CS 3500, January 2017.
+// Additional tests written by Bryce Hansen, Feb. 2018.
 
 using System;
 using System.Linq;
