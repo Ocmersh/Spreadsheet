@@ -45,6 +45,9 @@ namespace Formulas
         /// <exception cref="FormulaFormatException"></exception>
         public Formula(String formula)
         {
+            if(formula == null)
+                throw new ArgumentNullException();
+
             //parse out tokens
             userForm = GetTokens(formula);
 
@@ -82,6 +85,9 @@ namespace Formulas
 
         public Formula(String formula, Normalizer norm, Validator valid)
         {
+            if (formula == null || norm == null || valid == null)
+                throw new ArgumentNullException();
+
             this = new Formula(formula);
 
             string normForm = norm(string.Join("", userForm.ToArray()));
@@ -370,6 +376,39 @@ namespace Formulas
                 else
                     return num1 / num2;
             }
+        }
+
+        /// <summary>
+        /// Iterates through the formulas and returns an ISet of the list of variables in it.
+        /// </summary>
+        /// <returns>ISet</returns>
+        public ISet<string> GetVariable()
+        {
+            ISet<string> varList = new SortedSet<string>();
+
+            foreach (var token in userForm)
+            {
+                if (IsVariable(token))
+                    varList.Add(token);
+            }
+
+            return varList;
+        }
+
+        /// <summary>
+        /// Returns a string version of the Formula(in normalized form).
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            string formulaAsString = "";
+
+            foreach (var token in userForm)
+            {
+                formulaAsString += token;
+            }
+
+            return formulaAsString;
         }
 
         /// <summary>
