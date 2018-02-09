@@ -17,9 +17,10 @@ namespace Formulas
     /// the four binary operator symbols +, -, *, and /.  (The unary operators + and -
     /// are not allowed.)
     /// </summary>
-    public class Formula
+    public struct Formula
     {
         private IEnumerable<string> userForm;
+
 
         /// <summary>
         /// Creates a Formula from a string that consists of a standard infix expression composed
@@ -77,6 +78,21 @@ namespace Formulas
             else if (!IsClosingTrailingVarValid(userForm))
                 throw new FormulaFormatException(
                     "The token after a number, variable or closing parenthesis an operator or closing parenthesis.");
+        }
+
+        public Formula(String formula, Normalizer norm, Validator valid)
+        {
+            this = new Formula(formula);
+
+            string normForm = norm(string.Join("", userForm.ToArray()));
+            userForm = GetTokens(normForm);
+
+            if (!valid(normForm))
+            {
+                throw new FormulaFormatException(
+                    "The formula is not normalized!");
+            }
+
         }
 
         /// <summary>
@@ -408,6 +424,8 @@ namespace Formulas
     /// don't is up to the implementation of the method.
     /// </summary>
     public delegate double Lookup(string var);
+    public delegate string Normalizer(string s);
+    public delegate bool Validator(string s);
 
     /// <summary>
     /// Used to report that a Lookup delegate is unable to determine the value
