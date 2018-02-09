@@ -1,6 +1,7 @@
 ﻿// Written by Joe Zachary for CS 3500, January 2017.
 
 using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Formulas;
 
@@ -173,6 +174,7 @@ namespace FormulaTestCases
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
+        [TestMethod]
         public double Lookup4(String v)
         {
             switch (v)
@@ -197,6 +199,134 @@ namespace FormulaTestCases
             Formula f = new Formula("5/0");
             Assert.AreEqual(f.Evaluate(v => 0), 0, 1e-6);
         }
+
+        /// <summary>
+        /// test null formula argument
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void NullForm1()
+        {
+            Formula f = new Formula(null);
+        }
+
+        /// <summary>
+        /// This uses one of each kind of token.
+        /// </summary>
+        [TestMethod]
+        public void GetVar1()
+        {
+            Formula f = new Formula("(x + y) * (z / x) * 1.0");
+            string result = "";
+
+            foreach (var token in f.GetVariable())
+            {
+                result += token;
+            }
+
+            Assert.AreEqual("xyz", result);
+        }
+
+        /// <summary>
+        /// Checks accuracy of toString method
+        /// </summary>
+        [TestMethod]
+        public void ToString1()
+        {
+            Formula f = new Formula("(x + y) * (z / x) * 1.0");
+            string result = f.ToString();
+
+            Assert.AreEqual("(x+y)*(z/x)*1.0", result);
+
+        }
+
+        /// <summary>
+        /// simple Normalizer that converts a string to uppercase
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public string Normalizer(string s)
+        {
+            return s.ToUpper();
+        }
+
+        /// <summary>
+        /// empty Normalizer that does nothing
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public string Normalizer2(string s)
+        {
+            return s;
+        }
+
+        /// <summary>
+        /// simple Validator that verifies if a string is uppercase
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public bool Validator(string s)
+        {
+            if (s.ToUpper().Equals(s))
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Verifies the output of the normalizer
+        /// </summary>
+        [TestMethod]
+        public void NormTest()
+        {
+            Formula t = new Formula("x+y", Normalizer, Validator);
+
+            Assert.AreEqual("X+Y", t.ToString());
+        }
+
+        /// <summary>
+        /// Tests the creation of formula with a valid normalizer
+        /// </summary>
+        [TestMethod]
+        public void ValidTest()
+        {
+            Formula t = new Formula("x+y", Normalizer, Validator);
+
+            Assert.AreEqual(true, Validator(t.ToString()));
+        }
+
+        /// <summary>
+        /// Tests the creation of formula with an invalid normalizer
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void ValidTest2()
+        {
+            Formula t = new Formula("x+y", Normalizer2, Validator);
+        }
+
+        /// <summary>
+        /// Tests the creation of formula with a valid normalizer
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ValidTest3()
+        {
+            Formula t = new Formula("x+y", Normalizer, null);
+        }
+
+        /// <summary>
+        /// Test to see if normalized formula is equivalent to a non-normalized one.
+        /// </summary>
+        [TestMethod]
+        public void Equivalent()
+        {
+            Formula a = new Formula("A+B");
+            Formula b = new Formula("a+b", Normalizer, Validator);
+            Assert.AreEqual(a.ToString(), b.ToString());
+        }
+
+
 
     }
 }

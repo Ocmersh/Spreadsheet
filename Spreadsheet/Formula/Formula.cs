@@ -384,7 +384,7 @@ namespace Formulas
         /// <returns>ISet</returns>
         public ISet<string> GetVariable()
         {
-            ISet<string> varList = new SortedSet<string>();
+            ISet<string> varList = new HashSet<string>();
 
             foreach (var token in userForm)
             {
