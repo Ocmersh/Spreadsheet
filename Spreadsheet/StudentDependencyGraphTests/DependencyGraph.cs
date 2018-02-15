@@ -1,5 +1,4 @@
 ﻿///Test class for DependencyGraph written by Bryce Hansen
-/// 
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace DependencyGraphTestCases
 {
     [TestClass]
-    public class UnitTest1
+    public class DependencyGraph
     {
         /// <summary>
         /// This class tests each method is DependencyGraph.

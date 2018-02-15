@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace DependencyGraphTestCases
 {
     [TestClass]
-    public class UnitTest1
+    public class DependencyGraphTests
     {
         /// <summary>
         /// This class tests each method is DependencyGraph.
