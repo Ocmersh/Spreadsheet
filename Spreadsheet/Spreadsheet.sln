@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PS2GradingTests", "PS2Gradi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spreadsheet", "Spreadsheet\Spreadsheet.csproj", "{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyGraphTestCases", "DependencyGraphTestCases\DependencyGraphTestCases.csproj", "{4AF4C987-60D7-4D91-B89C-D8145A610D4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentDependencyGraphTests", "StudentDependencyGraphTests\StudentDependencyGraphTests.csproj", "{119827A4-86B4-4941-917D-EAA3ECDB327D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +49,14 @@ Global
 		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AF4C987-60D7-4D91-B89C-D8145A610D4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AF4C987-60D7-4D91-B89C-D8145A610D4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AF4C987-60D7-4D91-B89C-D8145A610D4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AF4C987-60D7-4D91-B89C-D8145A610D4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{119827A4-86B4-4941-917D-EAA3ECDB327D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{119827A4-86B4-4941-917D-EAA3ECDB327D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{119827A4-86B4-4941-917D-EAA3ECDB327D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{119827A4-86B4-4941-917D-EAA3ECDB327D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
