@@ -220,7 +220,7 @@ namespace FormulaTestCases
             Formula f = new Formula("(x + y) * (z / x) * 1.0");
             string result = "";
 
-            foreach (var token in f.GetVariable())
+            foreach (var token in f.GetVariables())
             {
                 result += token;
             }

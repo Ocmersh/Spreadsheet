@@ -89,14 +89,23 @@ namespace Formulas
 
             this = new Formula(formula);
 
-            string normForm = norm(string.Join("", userForm.ToArray()));
-            userForm = GetTokens(normForm);
+            string normForm = "";
 
-            if (!valid(normForm))
+            foreach (string token in userForm)
             {
-                throw new FormulaFormatException(
-                    "The formula is not normalized!");
+                if (IsVariable(token))
+                {
+                    normForm += norm(token);
+
+                    if(!valid(norm(token)))
+                        throw new FormulaFormatException(
+                            "The formula is not normalized!");
+                }
+                else
+                    normForm += token;
             }
+
+            this = new Formula(normForm);
 
         }
 
@@ -111,9 +120,13 @@ namespace Formulas
         /// </summary>
         public double Evaluate(Lookup lookup)
         {
+            if (userForm == null)
+                return 0;
+
             Stack<string> operatorStack = new Stack<string>();
             Stack<double> valueStack = new Stack<double>();
             var tempV = 0.0;
+
             foreach (string token in userForm)
             {
                 if (double.TryParse(token, out tempV))
@@ -381,10 +394,11 @@ namespace Formulas
         /// Iterates through the formulas and returns an ISet of the list of variables in it.
         /// </summary>
         /// <returns>ISet</returns>
-        public ISet<string> GetVariable()
+        public ISet<string> GetVariables()
         {
             ISet<string> varList = new HashSet<string>();
 
+            if(userForm != null)
             foreach (var token in userForm)
             {
                 if (IsVariable(token))
@@ -401,6 +415,9 @@ namespace Formulas
         public override string ToString()
         {
             string formulaAsString = "";
+
+            if (userForm == null)
+                return "0";
 
             foreach (var token in userForm)
             {
