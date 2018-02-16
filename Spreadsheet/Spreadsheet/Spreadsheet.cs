@@ -88,11 +88,11 @@ namespace SS
                 int count = 0;
 
                 //keep incrementing until a non letter is found.
-                while (Char.IsLetter(validCheck[count]))
+                while (count < validCheck.Length && Char.IsLetter(validCheck[count]))
                     count++;
 
                 //check if non letter is a digit great than zero
-                if (Char.IsDigit(validCheck[count]))
+                if (count < validCheck.Length && Char.IsDigit(validCheck[count]))
                 {
                     int result = 0;
                     int.TryParse(validCheck[count].ToString(), out result);
@@ -100,7 +100,7 @@ namespace SS
                     if (result > 0)
                     {
                         //keep going until you run out of array
-                        while (Char.IsDigit(validCheck[count]) && count < validCheck.Length)
+                        while (count < validCheck.Length && Char.IsDigit(validCheck[count]))
                             count++;
 
                         if (count != validCheck.Length)
@@ -227,6 +227,9 @@ namespace SS
                 //find if variables are valid
                 if (IsInvalid(variable))
                     throw new InvalidNameException();
+
+                if (!basicSheetCells.ContainsKey(variable))
+                    basicSheetCells.Add(variable, new SheetCell(variable, ""));
 
                 sheetDependencyGraph.AddDependency(name, variable);
             }
