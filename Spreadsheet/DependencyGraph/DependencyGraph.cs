@@ -6,6 +6,7 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Dependencies
@@ -73,8 +74,16 @@ namespace Dependencies
         /// <param name="oldGraph"></param>
         public DependencyGraph(DependencyGraph oldGraph)
         {
-            dependees = new Dictionary<string, HashSet<string>>(oldGraph.GetDees());
-            dependents = new Dictionary<string, HashSet<string>>(oldGraph.GetDents());
+            dependees = new Dictionary<string, HashSet<string>>();
+            foreach (KeyValuePair<string, HashSet<string>> entry in oldGraph.GetDees())
+            {
+                dependees.Add(entry.Key, new HashSet<string>(entry.Value));
+            }
+            dependents = new Dictionary<string, HashSet<string>>();
+            foreach (KeyValuePair<string, HashSet<string>> entry in oldGraph.GetDents())
+            {
+                dependents.Add(entry.Key, new HashSet<string>(entry.Value));
+            }
         }
 
         private IDictionary<string, HashSet<string>> GetDees()
