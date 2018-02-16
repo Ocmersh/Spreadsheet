@@ -73,16 +73,16 @@ namespace Dependencies
         /// <param name="oldGraph"></param>
         public DependencyGraph(DependencyGraph oldGraph)
         {
-            dependees = new Dictionary<string, HashSet<string>>(oldGraph.GetDees()); 
+            dependees = new Dictionary<string, HashSet<string>>(oldGraph.GetDees());
             dependents = new Dictionary<string, HashSet<string>>(oldGraph.GetDents());
         }
 
-        private Dictionary<string, HashSet<string>> GetDees()
+        private IDictionary<string, HashSet<string>> GetDees()
         {
             return dependees;
         }
 
-        private Dictionary<string, HashSet<string>> GetDents()
+        private IDictionary<string, HashSet<string>> GetDents()
         {
             return dependents;
         }
