@@ -1,17 +1,17 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Spreadsheet;
+using SpreadsheetTests;
 using SS;
 
-namespace Spreadsheets
+namespace SpreadsheetTests
 {
     [TestClass]
-    public class SpreadSheetTest
+    public class UnitTest1
     {
         [TestMethod]
         public void TestMethod1()
         {
-            AbstractSpreadsheet sheet = new Spreadsheet();
+            AbstractSpreadsheet sheet = new SpreadsheetTests();
         }
     }
 }

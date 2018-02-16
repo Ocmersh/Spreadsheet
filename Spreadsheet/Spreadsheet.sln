@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormulaSimpleTests", "Formu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PS2GradingTests", "PS2GradingTests\PS2GradingTests.csproj", "{5F69302B-DF29-42D2-BFE2-4A168FF4F588}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SS", "Spreadsheet\SS.csproj", "{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spreadsheet", "Spreadsheet\Spreadsheet.csproj", "{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyGraphTestCases", "DependencyGraphTestCases\DependencyGraphTestCases.csproj", "{4AF4C987-60D7-4D91-B89C-D8145A610D4C}"
 EndProject
@@ -24,6 +24,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PS4aGradingTests", "PS4aGradingTests\PS4aGradingTests.csproj", "{BAF269F6-6B3D-4319-AAD5-B163DE642AE2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PS4bGradingTests", "PS4bGradingTests\PS4bGradingTests.csproj", "{610531D6-3F5E-4AA6-9301-093A8A593B95}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetTests", "SpreadsheetTests\SpreadsheetTests.csproj", "{AC41658D-2067-4A4D-BAAA-50825F44FA7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -70,6 +72,10 @@ Global
 		{610531D6-3F5E-4AA6-9301-093A8A593B95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{610531D6-3F5E-4AA6-9301-093A8A593B95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{610531D6-3F5E-4AA6-9301-093A8A593B95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC41658D-2067-4A4D-BAAA-50825F44FA7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC41658D-2067-4A4D-BAAA-50825F44FA7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC41658D-2067-4A4D-BAAA-50825F44FA7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC41658D-2067-4A4D-BAAA-50825F44FA7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
