@@ -1,5 +1,6 @@
 ﻿using Formulas;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,9 +41,14 @@ namespace SS
     /// </summary> 
     class SpreadSheet : AbstractSpreadsheet
     {
+        //Framework for the spreadsheet
         private Dictionary<string, SheetCell> basicSheetCells;
         private DependencyGraph sheetDependencyGraph;
+        private HashSet<string> recalcCells = new HashSet<string>();
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public SpreadSheet()
         {
             basicSheetCells = new Dictionary<string, SheetCell>();
@@ -69,7 +75,7 @@ namespace SS
                 throw new InvalidNameException();
 
             if(basicSheetCells.ContainsKey(name))
-                return basicSheetCells[name].ReturnContents();
+                return basicSheetCells[name].GetContent();
             else
                 return "";
             
@@ -77,15 +83,19 @@ namespace SS
 
         private bool IsInvalid(string name)
         {
+            //convert string to char array
             Char[] validCheck = name.ToCharArray();
 
+            //if first isn't a letter, return
             if (Char.IsLetter(validCheck[0]))
             {
                 int count = 0;
 
+                //keep incrementing until a non letter is found.
                 while (Char.IsLetter(validCheck[count]))
                     count++;
 
+                //check if non letter is a digit great than zero
                 if (Char.IsDigit(validCheck[count]))
                 {
                     int result = 0;
@@ -93,6 +103,7 @@ namespace SS
 
                     if (result > 0)
                     {
+                        //keep going until you run out of array
                         while (Char.IsDigit(validCheck[count]) && count < validCheck.Length)
                             count++;
 
@@ -125,12 +136,23 @@ namespace SS
         {
             if (name == null || IsInvalid(name))
                 throw new InvalidNameException();
-
+            
+            //store new content in cell, if cell is empty, initialize it
             if (basicSheetCells.ContainsKey(name))
-                basicSheetCells[name].SetContents(number);
+                basicSheetCells[name].SetContent(number);
             else
                 basicSheetCells.Add(name, new SheetCell(name, number));
 
+            //create an ISet of the affected dependents
+            ISet<String> names = new HashSet<string>(sheetDependencyGraph.GetDependents(name));
+
+            //update each affected dependent
+            foreach (var var in GetCellsToRecalculate(names))
+            {
+                Recalc(var, name);
+            }
+
+            //get new dependent list
             HashSet<string> dependentSet = new HashSet<string>(){name};
             foreach (var dependent in sheetDependencyGraph.GetDependents(name))
             {
@@ -159,11 +181,22 @@ namespace SS
             else if (name == null || IsInvalid(name))
                 throw new InvalidNameException();
 
+            //store new content in cell, if cell is empty, initialize it
             if (basicSheetCells.ContainsKey(name))
-                basicSheetCells[name].SetContents(text);
+                basicSheetCells[name].SetContent(text);
             else
                 basicSheetCells.Add(name, new SheetCell(name, text));
 
+            //create an ISet of the affected dependents
+            ISet<String> names = new HashSet<string>(sheetDependencyGraph.GetDependents(name));
+
+            //update each affected dependent
+            foreach (string var in GetCellsToRecalculate(names))
+            {
+                Recalc(var, name);
+            }
+
+            //get new dependent list
             HashSet<string> dependentSet = new HashSet<string>() { name };
             foreach (var dependent in sheetDependencyGraph.GetDependents(name))
             {
@@ -179,7 +212,7 @@ namespace SS
         /// If name is null or invalid, throws an InvalidNameException.
         /// 
         /// Otherwise, if changing the contents of the named cell to be the formula would cause a 
-        /// circular dependency, throws a CircularException.
+        /// circular dependency, throws a CircularException.-*
         /// 
         /// Otherwise, the contents of the named cell becomes formula.  The method returns a
         /// Set consisting of name plus the names of all other cells whose value depends,
@@ -190,25 +223,68 @@ namespace SS
         /// </summary>
         public override ISet<String> SetCellContents(String name, Formula formula)
         {
-            foreach (var variable in formula.GetVariable())
-            {
-                //find if variables are valid
-            }
             if (name == null || IsInvalid(name))
                 throw new InvalidNameException();
 
-            basicSheetCells[name].SetContents(formula);
+            foreach (var variable in formula.GetVariables())
+            {
+                //find if variables are valid
+                if (IsInvalid(variable))
+                    throw new InvalidNameException();
 
+                sheetDependencyGraph.AddDependency(name, variable);
+            }
+
+            //store new content in cell, if cell is empty, initialize it
+            if (basicSheetCells.ContainsKey(name))
+                basicSheetCells[name].SetContent(formula);
+            else
+                basicSheetCells.Add(name, new SheetCell(name, formula));
+
+            //create an ISet of the affected dependents
+            ISet<String> names = new HashSet<string>(sheetDependencyGraph.GetDependents(name));
+
+            //update each affected dependent
+            foreach (var var in GetCellsToRecalculate(names))
+            {
+                Recalc(var, name);
+            }
+
+            //get new dependent list
             HashSet<string> dependentSet = new HashSet<string>() { name };
             foreach (var dependent in sheetDependencyGraph.GetDependents(name))
             {
-                if (dependent.Equals(name))
-                    throw new CircularException();
-                else
                     dependentSet.Add(dependent);
             }
 
             return dependentSet;
+        }
+
+        /// <summary>
+        /// Recalculates the cell "needsRecalc" provided its dependee
+        /// </summary>
+        /// <param name="needsRecalc"></param>
+        /// <param name="dependee"></param>
+        private void Recalc(string needsRecalc, string dependee)
+        {
+            //get dependee content
+            Object temp = basicSheetCells[dependee].GetContent();
+            //get dependent formula
+            Formula temp2 = (Formula) basicSheetCells[needsRecalc].GetContent();
+
+            //check for typ and update the dependent with new dependee info
+            if (temp.GetType() is string)
+            {
+                basicSheetCells[needsRecalc].SetContent(new Formula(temp2.ToString()+((string) temp)));
+            }
+            else if (temp.GetType() is Formula)
+            {
+                basicSheetCells[needsRecalc].SetContent(new Formula(((Formula)temp).ToString()+temp2.ToString()));
+            }
+            else if (temp.GetType() is double)
+            {
+                temp2.Evaluate((s => (double)temp));
+            }
         }
 
         /// <summary>
@@ -238,29 +314,31 @@ namespace SS
             return sheetDependencyGraph.GetDependents(name);
         }
 
+        /// <summary>
+        /// Help cell class to hold information.
+        /// </summary>
         private class SheetCell
         {
             /// contents should be either a string, a double, or a Formula.
-            private Object contents;
-            private string cellName;
+            public string cellName { get; set; }
+            public object contentString { get; set; }
+
 
             public SheetCell(string name, object newContent)
             {
                 cellName = name;
-                contents = newContent;
+                contentString = newContent;
             }
 
-            public object ReturnContents()
+            public object GetContent()
             {
-                return contents;
+                return contentString;
             }
 
-            public void SetContents(object newObj)
+            public void SetContent(object newContent)
             {
-                contents = newObj;
+                contentString = newContent;
             }
         }
-
-
     }
 }
