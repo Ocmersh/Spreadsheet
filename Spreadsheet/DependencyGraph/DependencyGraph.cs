@@ -115,10 +115,8 @@ namespace Dependencies
         public IEnumerable<string> GetDependents(string s)
         {
             //looks up hashset in map and returns it
-            if (dependees.ContainsKey(s))
-                return dependees[s];
-            else
-                return new HashSet<string>();
+            if (dependees.ContainsKey(s)) return dependees[s];
+            else return new HashSet<string>();
         }
 
         /// <summary>
@@ -127,10 +125,8 @@ namespace Dependencies
         public IEnumerable<string> GetDependees(string s)
         {
             //looks up hashset in map and returns it
-            if (dependents.ContainsKey(s))
-                return dependents[s];
-            else
-                return new HashSet<string>();
+            if (dependents.ContainsKey(s)) return dependents[s];
+            else return new HashSet<string>();
         }
 
         /// <summary>
@@ -141,16 +137,12 @@ namespace Dependencies
         public void AddDependency(string s, string t)
         {
             //add new pair to to map, or update existing dependee
-            if (dependees.ContainsKey(s))
-                dependees[s].Add(t);
-            else
-                dependees.Add(s, new HashSet<string>() {t});
+            if (dependees.ContainsKey(s)) dependees[s].Add(t);
+            else dependees.Add(s, new HashSet<string>() {t});
 
             //and update dependet graph aswell
-            if (dependents.ContainsKey(t))
-                dependents[t].Add(s);
-            else
-                dependents.Add(t, new HashSet<string>() {s});
+            if (dependents.ContainsKey(t)) dependents[t].Add(s);
+            else dependents.Add(t, new HashSet<string>() {s});
         }
 
         /// <summary>
@@ -242,6 +234,5 @@ namespace Dependencies
                 AddDependency(newDependee, t);
             }
         }
-
     }
 }
