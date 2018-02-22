@@ -35,7 +35,7 @@ namespace SS
     /// A1 depends on B1, which depends on C1, which depends on A1.  That's a circular
     /// dependency.
     /// </summary> 
-    public class SpreadSheet : AbstractSpreadsheet
+    public class Spreadsheet : AbstractSpreadsheet
     {
         //Framework for the spreadsheet
         private Dictionary<string, SheetCell> basicSheetCells;
@@ -45,7 +45,7 @@ namespace SS
         /// <summary>
         /// Constructor
         /// </summary>
-        public SpreadSheet()
+        public Spreadsheet()
         {
             basicSheetCells = new Dictionary<string, SheetCell>();
             sheetDependencyGraph = new DependencyGraph();

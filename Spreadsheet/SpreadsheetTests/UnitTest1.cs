@@ -12,13 +12,13 @@ namespace SpreadSheetTests
         [TestMethod]
         public void TestMethod1()
         {
-            AbstractSpreadsheet sheet = new SpreadSheet();
+            AbstractSpreadsheet sheet = new Spreadsheet();
         }
 
         [TestMethod]
         public void TestMethod2()
         {
-            AbstractSpreadsheet sheet = new SpreadSheet();
+            AbstractSpreadsheet sheet = new Spreadsheet();
             sheet.SetCellContents("A1", "A");
             Assert.AreEqual("A1", sheet.GetNamesOfAllNonemptyCells().ElementAt(0));
 
@@ -26,7 +26,7 @@ namespace SpreadSheetTests
         [TestMethod]
         public void TestMethod3()
         {
-            AbstractSpreadsheet sheet = new SpreadSheet();
+            AbstractSpreadsheet sheet = new Spreadsheet();
             sheet.SetCellContents("A1", "A");
             object test = sheet.GetCellContents("A1");
             Assert.AreEqual("A", (string)test);
@@ -35,7 +35,7 @@ namespace SpreadSheetTests
         [ExpectedException(typeof(InvalidNameException))]
         public void TestMethod4()
         {
-            AbstractSpreadsheet sheet = new SpreadSheet();
+            AbstractSpreadsheet sheet = new Spreadsheet();
             sheet.SetCellContents(null, "A");
             object test = sheet.GetCellContents("A1");
             Assert.AreEqual("A", (string)test);
@@ -43,7 +43,7 @@ namespace SpreadSheetTests
         [TestMethod]
         public void TestMethod5()
         {
-            AbstractSpreadsheet sheet = new SpreadSheet();
+            AbstractSpreadsheet sheet = new Spreadsheet();
             sheet.SetCellContents("A1", 2.0);
             object test = sheet.GetCellContents("A1");
             Assert.AreEqual(2.0, (double)test);
@@ -53,7 +53,7 @@ namespace SpreadSheetTests
         [ExpectedException(typeof(InvalidNameException))]
         public void TestMethod6()
         {
-            AbstractSpreadsheet sheet = new SpreadSheet();
+            AbstractSpreadsheet sheet = new Spreadsheet();
             sheet.SetCellContents(null, 2.0);
             object test = sheet.GetCellContents("A1");
             Assert.AreEqual(2.0, (double)test);
@@ -62,7 +62,7 @@ namespace SpreadSheetTests
         [TestMethod]
         public void TestMethod7()
         {
-            AbstractSpreadsheet sheet = new SpreadSheet();
+            AbstractSpreadsheet sheet = new Spreadsheet();
             sheet.SetCellContents("A1", new Formula("B2"));
             object test = sheet.GetCellContents("A1");
             Assert.AreEqual("B2", ((Formula)test).ToString());
