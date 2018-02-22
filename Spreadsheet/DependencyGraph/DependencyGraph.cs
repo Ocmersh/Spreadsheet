@@ -198,13 +198,13 @@ namespace Dependencies
             if (dependees.ContainsKey(s))
                 dependees[s].Add(t);
             else
-                dependees.Add(s, new HashSet<string>() {t});
+                dependees.Add(s, new HashSet<string>() { t });
 
             //and update dependet graph aswell
             if (dependents.ContainsKey(t))
                 dependents[t].Add(s);
             else
-                dependents.Add(t, new HashSet<string>() {s});
+                dependents.Add(t, new HashSet<string>() { s });
         }
 
         /// <summary>
@@ -294,14 +294,14 @@ namespace Dependencies
 
             foreach (var parameter in newDependeeList)
             {
-                if(parameter == null)
+                if (parameter == null)
                     throw new ArgumentNullException();
             }
 
             if (dependents.ContainsKey(t))
             {
 
-            //remove empty elements
+                //remove empty elements
                 foreach (var dependee in dependents[t])
                 {
                     dependees[dependee].Remove(t);
