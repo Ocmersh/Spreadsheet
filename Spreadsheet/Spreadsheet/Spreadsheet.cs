@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.IO;
 using Dependencies;
 using Formulas;
 
@@ -42,6 +43,8 @@ namespace SS
         private Dictionary<string, SheetCell> basicSheetCells;
         private DependencyGraph sheetDependencyGraph;
         private HashSet<string> recalcCells = new HashSet<string>();
+
+        public override bool Changed { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Constructor
@@ -301,6 +304,21 @@ namespace SS
                 throw new InvalidNameException();
 
             return sheetDependencyGraph.GetDependents(name);
+        }
+
+        public override void Save(TextWriter dest)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override object GetCellValue(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ISet<string> SetContentsOfCell(string name, string content)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
