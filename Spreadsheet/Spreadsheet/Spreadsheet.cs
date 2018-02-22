@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
+using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;
 using Dependencies;
 using Formulas;
@@ -48,7 +49,7 @@ namespace SS
         private HashSet<string> recalcCells = new HashSet<string>();
         private Regex IsValid;
 
-        // ADDED FOR PS6
+        // ADDED FOR PS6. Code Added.
         /// <summary>
         /// True if this spreadsheet has been modified since it was created or saved
         /// (whichever happened most recently); false otherwise.
@@ -65,7 +66,7 @@ namespace SS
             IsValid = new Regex(".*");
         }
 
-        //Added for PS6
+        //Added for PS6. Code Added.
         /// <summary>
         /// Creates an empty Spreadsheet whose IsValid regular expression is provided as the parameter
         /// </summary>
@@ -434,8 +435,11 @@ namespace SS
         /// </summary>
         /// <param name="eval"></param>
         /// <returns></returns>
-        private double Lookup(String eval)
+        public double Lookup(String eval)
         {
+            if(!basicSheetCells.ContainsKey(eval))
+                throw new UndefinedVariableException(eval);
+
             double result = 0.0;
 
             //check to see if variable contains a formula, evaluate that formula first before proceeding.
@@ -454,7 +458,7 @@ namespace SS
             return result;
         }
 
-        // ADDED FOR PS6
+        // ADDED FOR PS6. Code Added.
         /// <summary>
         /// If content is null, throws an ArgumentNullException.
         ///
@@ -488,7 +492,46 @@ namespace SS
         /// </summary>
         public override ISet<string> SetContentsOfCell(string name, string content)
         {
-            throw new NotImplementedException();
+            //exception check
+            if (content == null)
+                throw new ArgumentNullException();
+            if (name == null || IsInvalid(name))
+                throw new InvalidNameException();
+
+            //temp variable to check and store double value
+            double doubleResult;
+
+            //try to parse double, if so set it
+            if (double.TryParse(content, out doubleResult))
+                return SetCellContents(name, doubleResult);
+
+            //temp variable for new formula in the form of a string
+            string stringResult = "";
+
+            //try to parse formula, if so set it
+            if (content.ToCharArray()[0].Equals("="))
+            {
+                char[] formParse = content.ToCharArray();
+                for(int current = 1; current < formParse.Length; current++)
+                    stringResult += formParse[current];
+
+                Formula newForm = new Formula(stringResult, s => s.ToUpper(), Validator);
+
+                return SetCellContents(name, newForm);
+            }
+
+            //if you've gotten to the point, set string
+            return SetCellContents(name, content);
+        }
+
+        /// <summary>
+        /// Simple validator to identify that key is a valid cell name.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public bool Validator(string s)
+        {
+            return !IsInvalid(s);
         }
 
         /// <summary>
