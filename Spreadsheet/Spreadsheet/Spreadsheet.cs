@@ -198,7 +198,7 @@ namespace SS
             //add each dependent and each dependents dependent to the list
             foreach (var dependent in sheetDependencyGraph.GetDependents(name))
             {
-                getDependentSet(dependent, dependentSet);
+                GetDependentSet(dependent, dependentSet);
             }
 
             return dependentSet;
@@ -210,7 +210,7 @@ namespace SS
         /// <param name="name"></param>
         /// <param name="dependentSet"></param>
         /// <returns></returns>
-        private ISet<string> getDependentSet(string name, HashSet<string> dependentSet)
+        private ISet<string> GetDependentSet(string name, HashSet<string> dependentSet)
         {
             //add dependent
             dependentSet.Add(name);
@@ -222,7 +222,7 @@ namespace SS
                 if (sheetDependencyGraph.HasDependents(dependent))
                     foreach (var subDep in sheetDependencyGraph.GetDependents(name))
                         //recursive call
-                        getDependentSet(subDep, dependentSet);
+                        GetDependentSet(subDep, dependentSet);
             }
 
             return dependentSet;
@@ -269,7 +269,7 @@ namespace SS
             //get new dependent list
             foreach (var dependent in sheetDependencyGraph.GetDependents(name))
             {
-                getDependentSet(dependent, dependentSet);
+                GetDependentSet(dependent, dependentSet);
             }
 
             return dependentSet;
@@ -336,7 +336,7 @@ namespace SS
             HashSet<string> dependentSet = new HashSet<string>() {name};
             foreach (var dependent in sheetDependencyGraph.GetDependents(name))
             {
-                getDependentSet(dependent, dependentSet);
+                GetDependentSet(dependent, dependentSet);
             }
 
             return dependentSet;
@@ -407,7 +407,7 @@ namespace SS
             dest.WriteLine("<spreadsheet>");
         }
 
-        // ADDED FOR PS6
+        // ADDED FOR PS6. Code Added
         /// <summary>
         /// If name is null or invalid, throws an InvalidNameException.
         ///
@@ -424,20 +424,34 @@ namespace SS
             else if (basicSheetCells[name].GetContent() is double)
                 return (double) basicSheetCells[name].GetContent();
             else if (basicSheetCells[name].GetContent() is Formula)
-                return EvalForm((Formula) basicSheetCells[name].GetContent()); //return value that is calculated
+                return ((Formula) basicSheetCells[name].GetContent()).Evaluate(Lookup); //return value that is calculated
 
             return "";
         }
 
-        //TBC
         /// <summary>
-        /// TBD - Helper method to evaulate a formula chain or throw a formula error.
+        /// Takes a variable name as a parameter and returns its value.
         /// </summary>
         /// <param name="eval"></param>
         /// <returns></returns>
-        private double EvalForm(Formula eval)
+        private double Lookup(String eval)
         {
-            return 0.0;
+            double result = 0.0;
+
+            //check to see if variable contains a formula, evaluate that formula first before proceeding.
+            if(basicSheetCells[eval].GetContent() is Formula && ((Formula) basicSheetCells[eval].GetContent()).GetVariables().Count > 0)
+                result = ((Formula)basicSheetCells[eval].GetContent()).Evaluate(Lookup);
+            else
+                {
+                    //if a double value, return it
+                    if (basicSheetCells[eval].GetContent() is double)
+                        result = (double) basicSheetCells[eval].GetContent();
+                    //if string does not parse to double, create new error
+                    else if (!double.TryParse(basicSheetCells[eval].GetContent().ToString(), out result))
+                        new FormulaError(eval);
+                }
+
+            return result;
         }
 
         // ADDED FOR PS6
