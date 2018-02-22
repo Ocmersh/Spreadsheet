@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using Dependencies;
 using Formulas;
 
-namespace SS 
+namespace SS
 {
     /// <summary>
     /// A string s is a valid cell name if and only if it consists of one or more letters, 
@@ -67,14 +68,9 @@ namespace SS
         /// </summary>
         public override object GetCellContents(String name)
         {
-            if (name == null || IsInvalid(name))
-                throw new InvalidNameException();
-
-            if(basicSheetCells.ContainsKey(name))
-                return basicSheetCells[name].GetContent();
-            else
-                return "";
-            
+            if (name == null || IsInvalid(name)) throw new InvalidNameException();
+            if (basicSheetCells.ContainsKey(name)) return basicSheetCells[name].GetContent();
+            else return "";
         }
 
         private bool IsInvalid(string name)
@@ -88,34 +84,25 @@ namespace SS
                 int count = 0;
 
                 //keep incrementing until a non letter is found.
-                while (count < validCheck.Length && Char.IsLetter(validCheck[count]))
-                    count++;
+                while (count < validCheck.Length && Char.IsLetter(validCheck[count])) count++;
 
                 //check if non letter is a digit great than zero
                 if (count < validCheck.Length && Char.IsDigit(validCheck[count]))
                 {
                     int result = 0;
                     int.TryParse(validCheck[count].ToString(), out result);
-
                     if (result > 0)
                     {
                         //keep going until you run out of array
-                        while (count < validCheck.Length && Char.IsDigit(validCheck[count]))
-                            count++;
-
-                        if (count != validCheck.Length)
-                            return true;
-                        else
-                            return false;
+                        while (count < validCheck.Length && Char.IsDigit(validCheck[count])) count++;
+                        if (count != validCheck.Length) return true;
+                        else return false;
                     }
-                    else
-                        return true;
+                    else return true;
                 }
-                else
-                    return true;
+                else return true;
             }
-            else
-                return true;
+            else return true;
         }
 
         /// <summary>
@@ -130,14 +117,11 @@ namespace SS
         /// </summary>
         public override ISet<String> SetCellContents(String name, double number)
         {
-            if (name == null || IsInvalid(name))
-                throw new InvalidNameException();
-            
+            if (name == null || IsInvalid(name)) throw new InvalidNameException();
+
             //store new content in cell, if cell is empty, initialize it
-            if (basicSheetCells.ContainsKey(name))
-                basicSheetCells[name].SetContent(number);
-            else
-                basicSheetCells.Add(name, new SheetCell(name, number));
+            if (basicSheetCells.ContainsKey(name)) basicSheetCells[name].SetContent(number);
+            else basicSheetCells.Add(name, new SheetCell(name, number));
 
             //create an ISet of the affected dependents
             ISet<String> names = new HashSet<string>(sheetDependencyGraph.GetDependents(name));
@@ -149,10 +133,26 @@ namespace SS
             }
 
             //get new dependent list
-            HashSet<string> dependentSet = new HashSet<string>(){name};
+            HashSet<string> dependentSet = new HashSet<string>() {name};
+
+            //add each dependent and each dependents dependent to the list
+            foreach (var dependent in sheetDependencyGraph.GetDependents(name))
+            {
+                getDependentSet(dependent, dependentSet);
+            }
+
+            return dependentSet;
+        }
+
+        private ISet<string> getDependentSet(string name, HashSet<string> dependentSet)
+        {
+            dependentSet.Add(name);
             foreach (var dependent in sheetDependencyGraph.GetDependents(name))
             {
                 dependentSet.Add(dependent);
+                if (sheetDependencyGraph.HasDependents(dependent))
+                    foreach (var subDep in sheetDependencyGraph.GetDependents(name))
+                        getDependentSet(subDep, dependentSet);
             }
 
             return dependentSet;
@@ -172,16 +172,21 @@ namespace SS
         /// </summary>
         public override ISet<String> SetCellContents(String name, String text)
         {
-            if (text == null)
-                throw new ArgumentException();
+            if (text == null) throw new ArgumentNullException();
             else if (name == null || IsInvalid(name))
                 throw new InvalidNameException();
+            HashSet<string> dependentSet = new HashSet<string>() {name};
+            if (basicSheetCells.ContainsKey(name) && text.Trim().Equals(""))
+            {
+                basicSheetCells.Remove(name);
+                return dependentSet;
+            }
+            else if (text.Trim().Equals(""))
+                return dependentSet;
 
             //store new content in cell, if cell is empty, initialize it
-            if (basicSheetCells.ContainsKey(name))
-                basicSheetCells[name].SetContent(text);
-            else
-                basicSheetCells.Add(name, new SheetCell(name, text));
+            if (basicSheetCells.ContainsKey(name)) basicSheetCells[name].SetContent(text);
+            else basicSheetCells.Add(name, new SheetCell(name, text));
 
             //create an ISet of the affected dependents
             ISet<String> names = new HashSet<string>(sheetDependencyGraph.GetDependents(name));
@@ -193,10 +198,9 @@ namespace SS
             }
 
             //get new dependent list
-            HashSet<string> dependentSet = new HashSet<string>() { name };
             foreach (var dependent in sheetDependencyGraph.GetDependents(name))
             {
-                dependentSet.Add(dependent);
+                getDependentSet(dependent, dependentSet);
             }
 
             return dependentSet;
@@ -219,41 +223,47 @@ namespace SS
         /// </summary>
         public override ISet<String> SetCellContents(String name, Formula formula)
         {
-            if (name == null || IsInvalid(name))
-                throw new InvalidNameException();
-
+            Dictionary<string, SheetCell> sheetRollback = new Dictionary<string, SheetCell>();
+            foreach (KeyValuePair<string, SheetCell> entry in basicSheetCells)
+                sheetRollback.Add(entry.Key, new SheetCell(entry.Key, entry.Value.GetContent()));
+            DependencyGraph dependRollback = new DependencyGraph(sheetDependencyGraph);
+            if (name == null || IsInvalid(name)) throw new InvalidNameException();
             foreach (var variable in formula.GetVariables())
             {
                 //find if variables are valid
-                if (IsInvalid(variable))
-                    throw new InvalidNameException();
-
+                if (IsInvalid(variable)) throw new InvalidNameException();
                 if (!basicSheetCells.ContainsKey(variable))
-                    basicSheetCells.Add(variable, new SheetCell(variable, ""));
-
-                sheetDependencyGraph.AddDependency(name, variable);
+                    basicSheetCells.Add(variable, new SheetCell(variable, formula));
+                sheetDependencyGraph.AddDependency(variable, name);
             }
 
             //store new content in cell, if cell is empty, initialize it
-            if (basicSheetCells.ContainsKey(name))
-                basicSheetCells[name].SetContent(formula);
-            else
-                basicSheetCells.Add(name, new SheetCell(name, formula));
+            if (basicSheetCells.ContainsKey(name)) basicSheetCells[name].SetContent(formula);
+            else basicSheetCells.Add(name, new SheetCell(name, formula));
 
             //create an ISet of the affected dependents
             ISet<String> names = new HashSet<string>(sheetDependencyGraph.GetDependents(name));
 
             //update each affected dependent
-            foreach (var var in GetCellsToRecalculate(names))
+            try
             {
-                Recalc(var, name);
+                foreach (var var in GetCellsToRecalculate(names))
+                {
+                    Recalc(var, name);
+                }
+            }
+            catch (CircularException e)
+            {
+                basicSheetCells = sheetRollback;
+                sheetDependencyGraph = dependRollback;
+                throw new CircularException();
             }
 
             //get new dependent list
-            HashSet<string> dependentSet = new HashSet<string>() { name };
+            HashSet<string> dependentSet = new HashSet<string>() {name};
             foreach (var dependent in sheetDependencyGraph.GetDependents(name))
             {
-                    dependentSet.Add(dependent);
+                getDependentSet(dependent, dependentSet);
             }
 
             return dependentSet;
@@ -266,23 +276,26 @@ namespace SS
         /// <param name="dependee"></param>
         private void Recalc(string needsRecalc, string dependee)
         {
+            Formula temp2;
+
             //get dependee content
             Object temp = basicSheetCells[dependee].GetContent();
             //get dependent formula
-            Formula temp2 = (Formula) basicSheetCells[needsRecalc].GetContent();
+            if (basicSheetCells[needsRecalc].GetContent() is Formula)
+                temp2 = (Formula) basicSheetCells[needsRecalc].GetContent();
 
             //check for typ and update the dependent with new dependee info
             if (temp.GetType() is string)
             {
-                basicSheetCells[needsRecalc].SetContent(new Formula(temp2.ToString()+((string) temp)));
+                basicSheetCells[needsRecalc].SetContent(new Formula(temp2.ToString() + ((string) temp)));
             }
             else if (temp.GetType() is Formula)
             {
-                basicSheetCells[needsRecalc].SetContent(new Formula(((Formula)temp).ToString()+temp2.ToString()));
+                basicSheetCells[needsRecalc].SetContent(new Formula(((Formula) temp).ToString() + temp2.ToString()));
             }
             else if (temp.GetType() is double)
             {
-                temp2.Evaluate((s => (double)temp));
+                temp2.Evaluate((s => (double) temp));
             }
         }
 
@@ -305,11 +318,9 @@ namespace SS
         /// </summary>
         protected override IEnumerable<String> GetDirectDependents(String name)
         {
-            if (name == null) 
-                throw new ArgumentNullException();
-            else if(IsInvalid(name))
+            if (name == null) throw new ArgumentNullException();
+            else if (IsInvalid(name))
                 throw new InvalidNameException();
-
             return sheetDependencyGraph.GetDependents(name);
         }
 
@@ -320,8 +331,8 @@ namespace SS
         {
             /// contents should be either a string, a double, or a Formula.
             public string cellName { get; set; }
-            public object contentString { get; set; }
 
+            public object contentString { get; set; }
 
             public SheetCell(string name, object newContent)
             {
