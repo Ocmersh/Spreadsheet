@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Xml.Schema;
 using Dependencies;
 using Formulas;
 using System.Xml.Serialization;
@@ -67,7 +68,7 @@ namespace SS
             IsValid = new Regex(".*");
         }
 
-        //Added for PS6. Code Added.
+        //Added for PS6. Code Added. 
         /// <summary>
         /// Creates an empty Spreadsheet whose IsValid regular expression is provided as the parameter
         /// </summary>
@@ -111,15 +112,62 @@ namespace SS
         /// the new Spreadsheet's IsValid regular expression should be newIsValid.
         public Spreadsheet(TextReader source, Regex newIsValid)
         {
-            try {source.Peek();}
-            catch (Exception e)
+            basicSheetCells = new Dictionary<string, SheetCell>();
+            sheetDependencyGraph = new DependencyGraph();
+
+            XmlSchemaSet read = new XmlSchemaSet();
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.ValidationType = ValidationType.Schema;
+            settings.Schemas = read;
+            settings.ValidationEventHandler += SpreadsheetReadExceptionThrower;
+
+            Regex oldIsValid = new Regex(".*");
+            try {  oldIsValid = new Regex(newIsValid.ToString());}
+            catch (Exception e) {SpreadsheetReadExceptionThrower(newIsValid, null);}
+
+            using (XmlReader reader = XmlReader.Create(source, settings))
             {
-                throw new IOException();
+                while (reader.Read())
+                {
+                    if (reader.IsStartElement())
+                    {
+                        switch (reader.Name)
+                        {
+                            
+
+                            case "spreadsheet":
+                                break;
+
+                            case "cell":
+                                string named = reader["name"];
+                                string content = reader["contents"];
+
+                                if (basicSheetCells.ContainsKey(named) || IsInvalid(reader[named]) || !oldIsValid.IsMatch(named))
+                                    SpreadsheetReadExceptionThrower(reader, null);
+                                else if (newIsValid.IsMatch(named))
+                                    throw new SpreadsheetVersionException(named);
+
+                                try { new Formula(content); }
+                                catch (FormulaFormatException e) { SpreadsheetReadExceptionThrower(e, null);}
+
+                                SetCellContents(named, content);
+                                break;
+                        }
+                    }
+                }
+
+                IsValid = newIsValid;
             }
+        }
 
-
-
-
+        /// <summary>
+        /// Throws a read exception.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public static void SpreadsheetReadExceptionThrower(object sender, ValidationEventArgs e)
+        {
+            throw new SpreadsheetReadException(sender.ToString());
         }
 
         /// <summary>
@@ -378,7 +426,7 @@ namespace SS
             return sheetDependencyGraph.GetDependents(name);
         }
 
-        // ADDED FOR PS6. Code Added
+        // ADDED FOR PS6. Code Added (Try/catch error??)
         /// <summary>
         /// Writes the contents of this spreadsheet to dest using an XML format.
         /// The XML elements should be structured as follows:
