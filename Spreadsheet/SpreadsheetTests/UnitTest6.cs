@@ -9,16 +9,9 @@ using System.Xml;
 
 namespace SpreadsheetTests
 {
-    /// <summary>
-    /// These are grading tests for PS5
-    ///</summary>
     [TestClass()]
     public class UnitTest6
     {
-        /// <summary>
-        /// Used to make assertions about set equality.  Everything is converted first to
-        /// upper case.
-        /// </summary>
         public static void AssertSetEqualsIgnoreCase(IEnumerable<string> s1, IEnumerable<string> s2)
         {
             var set1 = new HashSet<String>();
@@ -208,6 +201,15 @@ namespace SpreadsheetTests
             AbstractSpreadsheet s = new Spreadsheet();
             s.SetContentsOfCell("A1", "string");
             Assert.AreEqual("string", s.GetCellValue("A1"));
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void Value7()
+        {
+            AbstractSpreadsheet s = new Spreadsheet();
+            s.SetContentsOfCell("A1", "6");
+            Assert.AreEqual("=", s.GetCellValue("A2%"));
         }
 
         [TestMethod()]

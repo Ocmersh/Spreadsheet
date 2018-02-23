@@ -120,6 +120,7 @@ namespace SS
             sheetDependencyGraph = new DependencyGraph();
 
             XmlSchemaSet read = new XmlSchemaSet();
+            read.Add(null, "Spreadsheet.xsd");
             XmlReaderSettings settings = new XmlReaderSettings();
             settings.ValidationType = ValidationType.Schema;
             settings.Schemas = read;
@@ -469,18 +470,11 @@ namespace SS
                             writer.WriteAttributeString("contents", "="+((Formula) cell.Value.GetContent()));
                             writer.WriteEndElement();
                         }
-                        else if ((cell.Value.GetContent() is double))
+                        else 
                         {
                             writer.WriteStartElement("cell");
                             writer.WriteAttributeString("name", cell.Key);
                             writer.WriteAttributeString("contents", ((double) cell.Value.GetContent()).ToString());
-                            writer.WriteEndElement();
-                        }
-                        else if ((cell.Value.GetContent() is string))
-                        {
-                            writer.WriteStartElement("cell");
-                            writer.WriteAttributeString("name", cell.Key);
-                            writer.WriteAttributeString("contents", ((string)cell.Value.GetContent()));
                             writer.WriteEndElement();
                         }
                     }
