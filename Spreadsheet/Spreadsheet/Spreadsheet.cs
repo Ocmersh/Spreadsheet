@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Runtime.ExceptionServices;
+using System.Runtime.Remoting.Messaging;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Schema;
@@ -56,7 +57,7 @@ namespace SS
         /// True if this spreadsheet has been modified since it was created or saved
         /// (whichever happened most recently); false otherwise.
         /// </summary>
-        public override bool Changed { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
+        public override bool Changed { get => false; protected set => value = true; }
 
         /// <summary>
         /// Creates an empty Spreadsheet whose IsValid regular expression accepts every string.
@@ -66,6 +67,7 @@ namespace SS
             basicSheetCells = new Dictionary<string, SheetCell>();
             sheetDependencyGraph = new DependencyGraph();
             IsValid = new Regex(".*");
+            Changed = false;
         }
 
         //Added for PS6. Code Added. 
@@ -78,6 +80,7 @@ namespace SS
             basicSheetCells = new Dictionary<string, SheetCell>();
             sheetDependencyGraph = new DependencyGraph();
             this.IsValid = isValid;
+            Changed = false;
         }
 
         //Added for PS6
@@ -112,6 +115,7 @@ namespace SS
         /// the new Spreadsheet's IsValid regular expression should be newIsValid.
         public Spreadsheet(TextReader source, Regex newIsValid)
         {
+            Changed = true;
             basicSheetCells = new Dictionary<string, SheetCell>();
             sheetDependencyGraph = new DependencyGraph();
 
@@ -133,8 +137,6 @@ namespace SS
                     {
                         switch (reader.Name)
                         {
-                            
-
                             case "spreadsheet":
                                 break;
 
@@ -426,7 +428,7 @@ namespace SS
             return sheetDependencyGraph.GetDependents(name);
         }
 
-        // ADDED FOR PS6. Code Added (Try/catch error??)
+        // ADDED FOR PS6. Code Added 
         /// <summary>
         /// Writes the contents of this spreadsheet to dest using an XML format.
         /// The XML elements should be structured as follows:
@@ -448,8 +450,8 @@ namespace SS
         /// </summary>
         public override void Save(TextWriter dest)
         {
-            try
-            {
+            Changed = false;
+           
                 using (XmlWriter writer = XmlWriter.Create(dest))
                 {
                     writer.WriteStartDocument();
@@ -486,11 +488,7 @@ namespace SS
                     writer.WriteEndElement();
                     writer.WriteEndDocument();
                 }
-            }
-            catch (Exception e)
-            {
-                throw new IOException();
-            }
+
         }
 
         // ADDED FOR PS6. Code Added
@@ -577,6 +575,8 @@ namespace SS
         /// </summary>
         public override ISet<string> SetContentsOfCell(string name, string content)
         {
+            Changed = true; 
+
             //exception check
             if (content == null)
                 throw new ArgumentNullException();
@@ -594,7 +594,7 @@ namespace SS
             string stringResult = "";
 
             //try to parse formula, if so set it
-            if (content.ToCharArray()[0].Equals("="))
+            if (content.ToCharArray().Length > 0 && content.ToCharArray()[0].ToString().Equals("="))
             {
                 char[] formParse = content.ToCharArray();
                 for(int current = 1; current < formParse.Length; current++)
