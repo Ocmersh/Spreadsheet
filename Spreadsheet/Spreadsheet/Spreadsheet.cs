@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;
+using System.Xml;
 using Dependencies;
 using Formulas;
 using System.Xml.Serialization;
@@ -110,6 +111,14 @@ namespace SS
         /// the new Spreadsheet's IsValid regular expression should be newIsValid.
         public Spreadsheet(TextReader source, Regex newIsValid)
         {
+            try {source.Peek();}
+            catch (Exception e)
+            {
+                throw new IOException();
+            }
+
+
+
 
         }
 
@@ -391,21 +400,49 @@ namespace SS
         /// </summary>
         public override void Save(TextWriter dest)
         {
-            //clear any existing info
-            dest.Flush();
-            dest.WriteLine("<spreadsheet IsValid="+IsValid.ToString()+">");
-
-            //write each cell to new line
-            foreach (var cell in basicSheetCells)
+            try
             {
-                if(cell.Value.GetContent() is Formula)
-                    dest.WriteLine("    <cell name=" + cell.Key + " contents==" + cell.Value.GetContent() + "></cell>");
-                else
-                    dest.WriteLine("    <cell name="+cell.Key+" contents="+cell.Value.GetContent()+"></cell>");
-            }
+                using (XmlWriter writer = XmlWriter.Create(dest))
+                {
+                    writer.WriteStartDocument();
+                    writer.WriteStartElement("spreadsheet");
+                    writer.WriteAttributeString("IsValid", IsValid.ToString());
 
-            //closing token
-            dest.WriteLine("<spreadsheet>");
+
+                    //write each cell to new line
+                    foreach (var cell in basicSheetCells)
+                    {
+                        if (cell.Value.GetContent() is Formula)
+                        {
+                            writer.WriteStartElement("cell");
+                            writer.WriteAttributeString("name", cell.Key);
+                            writer.WriteAttributeString("contents", "="+((Formula) cell.Value.GetContent()));
+                            writer.WriteEndElement();
+                        }
+                        else if ((cell.Value.GetContent() is double))
+                        {
+                            writer.WriteStartElement("cell");
+                            writer.WriteAttributeString("name", cell.Key);
+                            writer.WriteAttributeString("contents", ((double) cell.Value.GetContent()).ToString());
+                            writer.WriteEndElement();
+                        }
+                        else if ((cell.Value.GetContent() is string))
+                        {
+                            writer.WriteStartElement("cell");
+                            writer.WriteAttributeString("name", cell.Key);
+                            writer.WriteAttributeString("contents", ((string)cell.Value.GetContent()));
+                            writer.WriteEndElement();
+                        }
+                    }
+
+                    writer.WriteEndElement();
+                    writer.WriteEndDocument();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new IOException();
+            }
         }
 
         // ADDED FOR PS6. Code Added
