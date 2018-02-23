@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
-using System.Runtime.ExceptionServices;
-using System.Runtime.Remoting.Messaging;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Schema;
 using Dependencies;
 using Formulas;
-using System.Xml.Serialization;
 
 
 namespace SS
@@ -145,13 +141,10 @@ namespace SS
                                 string named = reader["name"];
                                 string content = reader["contents"];
 
-                                if (basicSheetCells.ContainsKey(named) || IsInvalid(reader[named]) || !oldIsValid.IsMatch(named))
+                                if (basicSheetCells.ContainsKey(named) || IsInvalid(named) || !oldIsValid.IsMatch(named))
                                     SpreadsheetReadExceptionThrower(reader, null);
-                                else if (newIsValid.IsMatch(named))
+                                else if (!newIsValid.IsMatch(named))
                                     throw new SpreadsheetVersionException(named);
-
-                                try { new Formula(content); }
-                                catch (FormulaFormatException e) { SpreadsheetReadExceptionThrower(e, null);}
 
                                 SetCellContents(named, content);
                                 break;
@@ -474,7 +467,7 @@ namespace SS
                         {
                             writer.WriteStartElement("cell");
                             writer.WriteAttributeString("name", cell.Key);
-                            writer.WriteAttributeString("contents", ((double) cell.Value.GetContent()).ToString());
+                            writer.WriteAttributeString("contents", (cell.Value.GetContent()).ToString());
                             writer.WriteEndElement();
                         }
                     }
@@ -497,12 +490,14 @@ namespace SS
             if (name == null || IsInvalid(name))
                 throw new InvalidNameException();
 
+            //return contents if nothing needs to be calculated
             if (basicSheetCells[name].GetContent() is string)
                 return (string) basicSheetCells[name].GetContent();
             else if (basicSheetCells[name].GetContent() is double)
                 return (double) basicSheetCells[name].GetContent();
             else if (basicSheetCells[name].GetContent() is Formula)
-                return ((Formula) basicSheetCells[name].GetContent()).Evaluate(Lookup); //return value that is calculated
+                return ((Formula) basicSheetCells[name].GetContent())
+                    .Evaluate(Lookup); //return value that is calculated
 
             return "";
         }

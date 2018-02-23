@@ -223,8 +223,8 @@ namespace SpreadsheetTests
         [TestMethod()]
         public void Setup2()
         {
-            StreamReader reader = new StreamReader("B:\\School FIles\\CS Repo\\PS2\\Spreadsheet\\Spreadsheet\\Spreadsheet.xsd");
-            AbstractSpreadsheet s = new Spreadsheet(reader, new Regex(".*"));
+            StreamReader reader = new StreamReader("B:\\School FIles\\CS Repo\\PS2\\Spreadsheet\\Spreadsheet\\SampleSavedSpreadsheet.xml");
+            Spreadsheet s = new Spreadsheet(reader, new Regex(".*"));
             StreamWriter writer = new StreamWriter("B:\\Test2.xml");
             s.Save(writer);
         }
@@ -238,6 +238,14 @@ namespace SpreadsheetTests
             s.SetContentsOfCell("A3", "=" + new Formula("A4+A5").ToString());
             s.SetContentsOfCell("A5", "=" + new Formula("A6+A7").ToString());
             s.SetContentsOfCell("A7", "=" + new Formula("A1+A1").ToString());
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(UndefinedVariableException))]
+        public void invalidArg()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.Lookup("$");
         }
 
         [TestMethod()]
