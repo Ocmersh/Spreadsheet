@@ -381,7 +381,7 @@ namespace Formulas
         /// Iterates through the formulas and returns an ISet of the list of variables in it.
         /// </summary>
         /// <returns>ISet</returns>
-        public ISet<string> GetVariables()
+        public ISet<string> GetVariables() //added s
         {
             ISet<string> varList = new HashSet<string>();
 
